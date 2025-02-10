@@ -28,8 +28,8 @@ func (a *APIServer) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// check if user with given email exists
 	queries := a.getQueries()
+	// check if user with given email exists
 	dbUser, err := queries.GetUserByEmail(r.Context(), params.Email)
 	if err != nil {
 		m.RespondWithError(w, "Invalid Email or Password!", http.StatusUnauthorized)
@@ -39,7 +39,7 @@ func (a *APIServer) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	// hash password of the user with that email
 	hashedPw, err := m.HashPassword(params.Password)
 	if err != nil {
-		m.RespondWithError(w, "Invalid password!", http.StatusBadRequest)
+		m.RespondWithError(w, "Invalid Password!", http.StatusBadRequest)
 		return
 	}
 
@@ -102,4 +102,58 @@ func (a *APIServer) HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 	// respond with the new user's information
 	user := m.DBUserToUser(u)
 	m.RespondWithJSON(w, user, http.StatusCreated)
+}
+
+// create category handler
+func (a *APIServer) HandleCreateCategory(w http.ResponseWriter, r *http.Request) {
+	params := m.Category{}
+	err := m.FromJSON(r, params)
+	if err != nil {
+		m.RespondWithError(w, "Invalid JSON params!", http.StatusBadRequest)
+		log.Print(err)
+		return
+	}
+
+	queries := a.getQueries()
+
+	cat, err := queries.CreateCategory(r.Context(), params.CategoryName)
+
+	if err != nil {
+		m.RespondWithError(w, "Invalid JSON params!"+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	m.RespondWithJSON(w, struct {
+		Category string `json:"category"`
+	}{Category: cat}, http.StatusCreated)
+}
+
+// create product handler
+func (a *APIServer) HandleCreateProduct(w http.ResponseWriter, r *http.Request) {
+	params := m.Product{}
+	err := m.FromJSON(r, params)
+	if err != nil {
+		m.RespondWithError(w, "Invalid JSON params!"+err.Error(), http.StatusBadRequest)
+		log.Print(err)
+		return
+	}
+
+	queries := a.getQueries()
+
+	dbProduct, err := queries.CreateProduct(r.Context(), database.CreateProductParams{
+		ID:          uuid.New(),
+		Sku:         params.SKU,
+		Name:        params.Name,
+		Description: params.Description,
+		Price:       float32(params.Price),
+		Stockqty:    int32(params.StockQty),
+		Category:    params.CategoryName,
+	})
+	if err != nil {
+		m.RespondWithError(w, "Invalid JSON params!"+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	product := m.DBProductToProduct(dbProduct)
+	m.RespondWithJSON(w, product, http.StatusCreated)
 }

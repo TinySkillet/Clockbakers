@@ -8,6 +8,20 @@ import (
 	"github.com/google/uuid"
 )
 
+type Category struct {
+	Name string
+}
+
+type Product struct {
+	ID          uuid.UUID
+	Sku         string
+	Name        string
+	Description string
+	Price       float32
+	Stockqty    int32
+	Category    string
+}
+
 type User struct {
 	ID        uuid.UUID
 	FirstName string

@@ -10,6 +10,15 @@ $4, $5,
 $6, $7, $8)
 RETURNING *;
 
+-- name: UpdateUser :one
+UPDATE users SET 
+first_name=$1,
+last_name=$2,
+phone_no=$3,
+address=$4
+WHERE ID=$5
+RETURNING *;
+
 -- name: GetUsers :many
 SELECT * FROM users;
 

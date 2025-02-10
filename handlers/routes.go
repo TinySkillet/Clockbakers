@@ -38,14 +38,30 @@ func (a *APIServer) Run() {
 
 	getRouter.HandleFunc("/healthz", a.HandleHealthz)
 	getRouter.HandleFunc("/error", a.HandleError)
+	getRouter.HandleFunc("/user", m.MiddlewareValidateUser(a.HandleGetUser))
 	getRouter.HandleFunc("/users", m.MiddlewareValidateAdmin(a.HandleGetUsers))
+	getRouter.HandleFunc("/products", a.HandleGetProducts)
+	getRouter.HandleFunc("/categories", a.HandleGetCategories)
 
 	// sub router for post methods, post requests are routed to this router
 	postRouter := v1Router.Methods(http.MethodPost).Subrouter()
 
 	postRouter.HandleFunc("/login", a.HandleLogin)
-	postRouter.HandleFunc("/user?id={id}", m.MiddlewareValidateUser(a.HandleGetUserByID))
 	postRouter.HandleFunc("/user", a.HandleCreateUser)
+	postRouter.HandleFunc("/category", m.MiddlewareValidateAdmin(a.HandleCreateCategory))
+	postRouter.HandleFunc("/product", m.MiddlewareValidateAdmin(a.HandleCreateProduct))
+
+	// sub router for put methods, put requests are routed to this router
+	putRouter := v1Router.Methods(http.MethodPut).Subrouter()
+	putRouter.HandleFunc("/category", m.MiddlewareValidateAdmin(a.HandleUpdateCategory))
+	putRouter.HandleFunc("/product", m.MiddlewareValidateAdmin(a.HandleUpdateProduct))
+	putRouter.HandleFunc("/user", m.MiddlewareValidateUser(a.HandleUpdateUser))
+
+	// sub router for delete methods, put requests are routed to this router
+	deleteRouter := v1Router.Methods(http.MethodDelete).Subrouter()
+
+	deleteRouter.HandleFunc("/category", m.MiddlewareValidateAdmin(a.HandleDeleteCategory))
+	deleteRouter.HandleFunc("/product", m.MiddlewareValidateAdmin(a.HandleDeleteProduct))
 
 	// api server
 	server := http.Server{
