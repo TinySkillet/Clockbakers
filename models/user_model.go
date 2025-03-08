@@ -34,7 +34,7 @@ func DBUserToUser(dbUser database.User) User {
 		PhoneNo:   dbUser.PhoneNo,
 		Address:   dbUser.Address,
 		Password:  "",
-		Role:      dbUser.Role,
+		Role:      string(dbUser.Role),
 		CreatedAt: dbUser.CreatedAt,
 		UpdatedAt: dbUser.UpdatedAt,
 	}

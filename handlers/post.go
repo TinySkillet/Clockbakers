@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/TinySkillet/ClockBakers/internal/database"
 	middleware "github.com/TinySkillet/ClockBakers/middlewares"
@@ -53,7 +54,7 @@ func (a *APIServer) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	jwtToken, err := middleware.CreateToken(
 		dbUser.ID,
 		dbUser.Email,
-		dbUser.Role,
+		string(dbUser.Role),
 	)
 	if err != nil {
 		m.RespondWithError(w, err.Error(), http.StatusInternalServerError)
@@ -92,7 +93,9 @@ func (a *APIServer) HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 		PhoneNo:   params.PhoneNo,
 		Address:   params.Address,
 		Password:  hashed_password,
-		Role:      params.Role,
+		Role:      database.UserTypeCustomer,
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
 	})
 	if err != nil {
 		m.RespondWithError(w, "Invalid JSON params!"+err.Error(), http.StatusBadRequest)
@@ -115,7 +118,6 @@ func (a *APIServer) HandleCreateCategory(w http.ResponseWriter, r *http.Request)
 	}
 
 	queries := a.getQueries()
-
 	cat, err := queries.CreateCategory(r.Context(), params.CategoryName)
 
 	if err != nil {
@@ -139,7 +141,6 @@ func (a *APIServer) HandleCreateProduct(w http.ResponseWriter, r *http.Request) 
 	}
 
 	queries := a.getQueries()
-
 	dbProduct, err := queries.CreateProduct(r.Context(), database.CreateProductParams{
 		ID:          uuid.New(),
 		Sku:         params.SKU,
@@ -148,6 +149,8 @@ func (a *APIServer) HandleCreateProduct(w http.ResponseWriter, r *http.Request) 
 		Price:       float32(params.Price),
 		StockQty:    int32(params.StockQty),
 		Category:    params.CategoryName,
+		CreatedAt:   time.Now().UTC(),
+		UpdatedAt:   time.Now().UTC(),
 	})
 	if err != nil {
 		m.RespondWithError(w, "Invalid JSON params!"+err.Error(), http.StatusBadRequest)

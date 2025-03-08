@@ -57,6 +57,48 @@ func (ns NullOrderStatus) Value() (driver.Value, error) {
 	return string(ns.OrderStatus), nil
 }
 
+type UserType string
+
+const (
+	UserTypeCustomer UserType = "customer"
+	UserTypeAdmin    UserType = "admin"
+)
+
+func (e *UserType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = UserType(s)
+	case string:
+		*e = UserType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for UserType: %T", src)
+	}
+	return nil
+}
+
+type NullUserType struct {
+	UserType UserType
+	Valid    bool // Valid is true if UserType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullUserType) Scan(value interface{}) error {
+	if value == nil {
+		ns.UserType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.UserType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullUserType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.UserType), nil
+}
+
 type Cart struct {
 	ID     uuid.UUID
 	UserID uuid.UUID
@@ -119,7 +161,7 @@ type User struct {
 	PhoneNo   string
 	Address   string
 	Password  string
-	Role      string
+	Role      UserType
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

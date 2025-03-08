@@ -34,7 +34,7 @@ type CreateUserParams struct {
 	PhoneNo   string
 	Address   string
 	Password  string
-	Role      string
+	Role      UserType
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -77,9 +77,9 @@ type GetRoleByIdAndEmailParams struct {
 	Email string
 }
 
-func (q *Queries) GetRoleByIdAndEmail(ctx context.Context, arg GetRoleByIdAndEmailParams) (string, error) {
+func (q *Queries) GetRoleByIdAndEmail(ctx context.Context, arg GetRoleByIdAndEmailParams) (UserType, error) {
 	row := q.db.QueryRowContext(ctx, getRoleByIdAndEmail, arg.ID, arg.Email)
-	var role string
+	var role UserType
 	err := row.Scan(&role)
 	return role, err
 }

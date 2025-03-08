@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/TinySkillet/ClockBakers/internal/database"
 	m "github.com/TinySkillet/ClockBakers/models"
@@ -84,6 +85,7 @@ func (a *APIServer) HandleUpdateProduct(w http.ResponseWriter, r *http.Request) 
 		Price:       float32(params.Price),
 		StockQty:    int32(params.StockQty),
 		Category:    params.CategoryName,
+		UpdatedAt:   time.Now().UTC(),
 	})
 	if err != nil {
 		m.RespondWithError(w, err.Error(), http.StatusBadRequest)
