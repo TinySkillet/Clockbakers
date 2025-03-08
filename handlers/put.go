@@ -82,7 +82,7 @@ func (a *APIServer) HandleUpdateProduct(w http.ResponseWriter, r *http.Request) 
 		Name:        params.Name,
 		Description: params.Description,
 		Price:       float32(params.Price),
-		Stockqty:    int32(params.StockQty),
+		StockQty:    int32(params.StockQty),
 		Category:    params.CategoryName,
 	})
 	if err != nil {

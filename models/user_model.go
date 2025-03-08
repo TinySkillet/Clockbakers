@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/TinySkillet/ClockBakers/internal/database"
 	"github.com/google/uuid"
 )
@@ -14,6 +16,8 @@ type User struct {
 	Address   string    `json:"address"`
 	Password  string    `json:"password,omitempty"`
 	Role      string    `json:"role"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type LoginRequest struct {
@@ -31,6 +35,8 @@ func DBUserToUser(dbUser database.User) User {
 		Address:   dbUser.Address,
 		Password:  "",
 		Role:      dbUser.Role,
+		CreatedAt: dbUser.CreatedAt,
+		UpdatedAt: dbUser.UpdatedAt,
 	}
 }
 

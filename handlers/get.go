@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"strconv"
 
+	"github.com/TinySkillet/ClockBakers/internal/database"
 	m "github.com/TinySkillet/ClockBakers/models"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -77,10 +78,42 @@ func (a *APIServer) HandleGetProducts(w http.ResponseWriter, r *http.Request) {
 	category := query.Get("category")
 	minPriceStr := query.Get("min_price")
 	maxPriceStr := query.Get("max_price")
-	sortBy := query.Get("sort_by")
-	order := query.Get("order")
 
-	fmt.Println(name, category, minPriceStr, maxPriceStr, sortBy, order)
+	minPrice := 0.0
+	maxPrice := 9999999.9
+
+	if minPriceStr != "" {
+		val, err := strconv.ParseFloat(minPriceStr, 64)
+		if err != nil {
+			m.RespondWithError(w, "Invalid min_price value in query", http.StatusBadRequest)
+			return
+		}
+		minPrice = val
+	}
+
+	if maxPriceStr != "" {
+		val, err := strconv.ParseFloat(maxPriceStr, 64)
+		if err != nil {
+			m.RespondWithError(w, "Invalid max_price value in query", http.StatusBadRequest)
+			return
+		}
+		maxPrice = val
+	}
+
+	queries := a.getQueries()
+	products, err := queries.GetProducts(r.Context(), database.GetProductsParams{
+		Column1: name,
+		Column2: minPrice,
+		Column3: maxPrice,
+		Column4: category,
+	})
+	if err != nil {
+		m.RespondWithError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	prds := m.DBProductsToProducts(products)
+	m.RespondWithJSON(w, prds, http.StatusOK)
 }
 
 // handler to get categories

@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/TinySkillet/ClockBakers/internal/database"
 	"github.com/google/uuid"
 )
@@ -13,6 +15,8 @@ type Product struct {
 	Price        float64   `json:"price"`
 	StockQty     int       `json:"stock_qty"`
 	CategoryName string    `json:"category"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 type Category struct {
@@ -26,7 +30,17 @@ func DBProductToProduct(dbProd database.Product) Product {
 		Name:         dbProd.Name,
 		Description:  dbProd.Description,
 		Price:        float64(dbProd.Price),
-		StockQty:     int(dbProd.Stockqty),
+		StockQty:     int(dbProd.StockQty),
 		CategoryName: dbProd.Category,
+		CreatedAt:    dbProd.CreatedAt,
+		UpdatedAt:    dbProd.UpdatedAt,
 	}
+}
+
+func DBProductsToProducts(dbProds []database.Product) []Product {
+	products := make([]Product, len(dbProds))
+	for i, dbProd := range dbProds {
+		products[i] = DBProductToProduct(dbProd)
+	}
+	return products
 }

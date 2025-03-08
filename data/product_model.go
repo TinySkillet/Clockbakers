@@ -52,7 +52,7 @@ func DBProductToProduct(dbProd database.Product) Product {
 		Name:         dbProd.Name,
 		Description:  dbProd.Description,
 		Price:        float64(dbProd.Price),
-		StockQty:     int(dbProd.Stockqty),
+		StockQty:     int(dbProd.StockQty),
 		CategoryName: dbProd.Category,
 	}
 }

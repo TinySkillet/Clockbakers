@@ -5,11 +5,89 @@
 package database
 
 import (
+	"database/sql/driver"
+	"fmt"
+	"time"
+
 	"github.com/google/uuid"
 )
 
+type OrderStatus string
+
+const (
+	OrderStatusPending    OrderStatus = "pending"
+	OrderStatusProcessing OrderStatus = "processing"
+	OrderStatusShipped    OrderStatus = "shipped"
+	OrderStatusDelivered  OrderStatus = "delivered"
+	OrderStatusCancelled  OrderStatus = "cancelled"
+)
+
+func (e *OrderStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = OrderStatus(s)
+	case string:
+		*e = OrderStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for OrderStatus: %T", src)
+	}
+	return nil
+}
+
+type NullOrderStatus struct {
+	OrderStatus OrderStatus
+	Valid       bool // Valid is true if OrderStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullOrderStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.OrderStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.OrderStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullOrderStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.OrderStatus), nil
+}
+
+type Cart struct {
+	ID     uuid.UUID
+	UserID uuid.UUID
+}
+
+type CartItem struct {
+	ID        uuid.UUID
+	Quantity  int32
+	CartID    uuid.UUID
+	ProductID uuid.UUID
+}
+
 type Category struct {
 	Name string
+}
+
+type Order struct {
+	ID         uuid.UUID
+	Status     OrderStatus
+	TotalPrice float32
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	UserID     uuid.UUID
+}
+
+type OrderItem struct {
+	ID              uuid.UUID
+	Quantity        int32
+	PriceAtPurchase float32
+	OrderID         uuid.UUID
+	ProductID       uuid.UUID
 }
 
 type Product struct {
@@ -18,8 +96,19 @@ type Product struct {
 	Name        string
 	Description string
 	Price       float32
-	Stockqty    int32
+	StockQty    int32
 	Category    string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+type Review struct {
+	ID        uuid.UUID
+	Rating    int32
+	Comment   string
+	CreatedAt time.Time
+	UserID    uuid.UUID
+	ProductID uuid.UUID
 }
 
 type User struct {
@@ -31,4 +120,6 @@ type User struct {
 	Address   string
 	Password  string
 	Role      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
