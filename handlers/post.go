@@ -110,7 +110,7 @@ func (a *APIServer) HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 // create category handler
 func (a *APIServer) HandleCreateCategory(w http.ResponseWriter, r *http.Request) {
 	params := m.Category{}
-	err := m.FromJSON(r, params)
+	err := m.FromJSON(r, &params)
 	if err != nil {
 		m.RespondWithError(w, "Invalid JSON params!", http.StatusBadRequest)
 		log.Print(err)
@@ -126,14 +126,14 @@ func (a *APIServer) HandleCreateCategory(w http.ResponseWriter, r *http.Request)
 	}
 
 	m.RespondWithJSON(w, struct {
-		Category string `json:"category"`
+		Category string `json:"category_name"`
 	}{Category: cat}, http.StatusCreated)
 }
 
 // create product handler
 func (a *APIServer) HandleCreateProduct(w http.ResponseWriter, r *http.Request) {
 	params := m.Product{}
-	err := m.FromJSON(r, params)
+	err := m.FromJSON(r, &params)
 	if err != nil {
 		m.RespondWithError(w, "Invalid JSON params!"+err.Error(), http.StatusBadRequest)
 		log.Print(err)

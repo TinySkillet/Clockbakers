@@ -76,16 +76,16 @@ const getProducts = `-- name: GetProducts :many
 SELECT id, sku, name, description, price, stock_qty, category, created_at, updated_at FROM products
 WHERE 
   ($1::TEXT = '' OR name ILIKE '%' || $1 || '%') AND
-  ($2 IS NULL OR price >= $2) AND
-  ($3 IS NULL OR price <= $3) AND
+  ($2::NUMERIC IS NULL OR price >= $2) AND
+  ($3::NUMERIC IS NULL OR price <= $3) AND
   ($4::TEXT = '' OR category = $4)
 ORDER BY name
 `
 
 type GetProductsParams struct {
 	Column1 string
-	Column2 interface{}
-	Column3 interface{}
+	Column2 *float64
+	Column3 *float64
 	Column4 string
 }
 

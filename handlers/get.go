@@ -48,7 +48,7 @@ func (a *APIServer) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 
 	dbUser, err := dbqueries.GetUserByID(r.Context(), id)
 	if err != nil {
-		m.RespondWithError(w, err.Error(), http.StatusBadRequest)
+		m.RespondWithError(w, err.Error(), http.StatusNotFound)
 		return
 	}
 	user := m.DBUserToUser(dbUser)
@@ -79,8 +79,7 @@ func (a *APIServer) HandleGetProducts(w http.ResponseWriter, r *http.Request) {
 	minPriceStr := query.Get("min_price")
 	maxPriceStr := query.Get("max_price")
 
-	minPrice := 0.0
-	maxPrice := 9999999.9
+	var minPrice, maxPrice *float64
 
 	if minPriceStr != "" {
 		val, err := strconv.ParseFloat(minPriceStr, 64)
@@ -88,7 +87,7 @@ func (a *APIServer) HandleGetProducts(w http.ResponseWriter, r *http.Request) {
 			m.RespondWithError(w, "Invalid min_price value in query", http.StatusBadRequest)
 			return
 		}
-		minPrice = val
+		minPrice = &val
 	}
 
 	if maxPriceStr != "" {
@@ -97,7 +96,7 @@ func (a *APIServer) HandleGetProducts(w http.ResponseWriter, r *http.Request) {
 			m.RespondWithError(w, "Invalid max_price value in query", http.StatusBadRequest)
 			return
 		}
-		maxPrice = val
+		maxPrice = &val
 	}
 
 	queries := a.getQueries()

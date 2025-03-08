@@ -20,7 +20,7 @@ type Product struct {
 }
 
 type Category struct {
-	CategoryName string `json:"name"`
+	CategoryName string `json:"category_name"`
 }
 
 func DBProductToProduct(dbProd database.Product) Product {
