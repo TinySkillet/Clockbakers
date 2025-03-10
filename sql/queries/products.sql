@@ -29,4 +29,3 @@ price=$4, stock_qty=$5, category=$6,
 updated_at=$7
 WHERE SKU=$1
 RETURNING *;
-

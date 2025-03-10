@@ -8,7 +8,6 @@ import (
 	"github.com/TinySkillet/ClockBakers/internal/database"
 	m "github.com/TinySkillet/ClockBakers/models"
 	"github.com/google/uuid"
-	"github.com/gorilla/mux"
 )
 
 // healthz handler to check if the server is up
@@ -24,46 +23,44 @@ func (a *APIServer) HandleError(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(struct{}{})
 }
 
-func (a *APIServer) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
+func (a *APIServer) HandleGetUserById(w http.ResponseWriter, r *http.Request) {
 	queries := a.getQueries()
-	us, err := queries.GetUsers(r.Context())
-	if err != nil {
-		m.RespondWithError(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	users := m.DBUsersToUsers(us)
-	m.RespondWithJSON(w, users, http.StatusOK)
-}
-
-func (a *APIServer) HandleGetUser(w http.ResponseWriter, r *http.Request) {
-	dbqueries := a.getQueries()
 
 	query := r.URL.Query()
 	idString := query.Get("id")
+
 	id, err := uuid.Parse(idString)
 	if err != nil {
-		m.RespondWithError(w, "Invalid id query parameter!", http.StatusBadRequest)
+		m.RespondWithError(w, "Invalid id!", http.StatusBadRequest)
+		return
+	}
+	dbUser, err := queries.GetUserByID(r.Context(), id)
+	if err != nil {
+		m.RespondWithError(w, "User not found!", http.StatusNotFound)
 		return
 	}
 
-	dbUser, err := dbqueries.GetUserByID(r.Context(), id)
-	if err != nil {
-		m.RespondWithError(w, err.Error(), http.StatusNotFound)
-		return
-	}
 	user := m.DBUserToUser(dbUser)
-	m.RespondWithJSON(w, user, http.StatusOK)
+	m.RespondWithJSON(w, user, http.StatusFound)
 }
 
-func (a *APIServer) HandleGetUsersByName(w http.ResponseWriter, r *http.Request) {
+func (a *APIServer) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
 	queries := a.getQueries()
 
-	vars := mux.Vars(r)
-	name := vars["name"]
+	query := r.URL.Query()
+	first_name := query.Get("first-name")
+	last_name := query.Get("last-name")
+	phone_no := query.Get("phone-no")
+	email := query.Get("email")
 
-	dbUsers, err := queries.GetUsersByName(r.Context(), name)
+	dbUsers, err := queries.GetUsers(r.Context(), database.GetUsersParams{
+		Column1: first_name,
+		Column2: last_name,
+		Column3: phone_no,
+		Column4: email,
+	})
 	if err != nil {
-		m.RespondWithError(w, err.Error(), http.StatusBadRequest)
+		m.RespondWithError(w, err.Error(), http.StatusNotFound)
 		return
 	}
 	users := m.DBUsersToUsers(dbUsers)
@@ -76,8 +73,8 @@ func (a *APIServer) HandleGetProducts(w http.ResponseWriter, r *http.Request) {
 
 	name := query.Get("name")
 	category := query.Get("category")
-	minPriceStr := query.Get("min_price")
-	maxPriceStr := query.Get("max_price")
+	minPriceStr := query.Get("min-price")
+	maxPriceStr := query.Get("max-price")
 
 	var minPrice, maxPrice *float64
 

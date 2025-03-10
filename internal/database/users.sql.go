@@ -68,24 +68,8 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
-const getRoleByIdAndEmail = `-- name: GetRoleByIdAndEmail :one
-SELECT role FROM users WHERE id=$1 AND email=$2
-`
-
-type GetRoleByIdAndEmailParams struct {
-	ID    uuid.UUID
-	Email string
-}
-
-func (q *Queries) GetRoleByIdAndEmail(ctx context.Context, arg GetRoleByIdAndEmailParams) (UserType, error) {
-	row := q.db.QueryRowContext(ctx, getRoleByIdAndEmail, arg.ID, arg.Email)
-	var role UserType
-	err := row.Scan(&role)
-	return role, err
-}
-
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, first_name, last_name, email, phone_no, address, password, role, created_at, updated_at FROM users WHERE email=$1
+SELECT id, first_name, last_name, email, phone_no, address, password, role, created_at, updated_at FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -130,48 +114,28 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 
 const getUsers = `-- name: GetUsers :many
 SELECT id, first_name, last_name, email, phone_no, address, password, role, created_at, updated_at FROM users
+WHERE 
+  ($1::TEXT = '' OR first_name ILIKE '%' || $1 || '%') AND
+  ($2::TEXT = '' OR last_name ILIKE '%' || $2 || '%') AND
+  ($3::TEXT = '' OR phone_no = $3) AND
+  ($4::TEXT = '' OR email = $4)
+ORDER BY first_name
 `
 
-func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
-	rows, err := q.db.QueryContext(ctx, getUsers)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []User
-	for rows.Next() {
-		var i User
-		if err := rows.Scan(
-			&i.ID,
-			&i.FirstName,
-			&i.LastName,
-			&i.Email,
-			&i.PhoneNo,
-			&i.Address,
-			&i.Password,
-			&i.Role,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+type GetUsersParams struct {
+	Column1 string
+	Column2 string
+	Column3 string
+	Column4 string
 }
 
-const getUsersByName = `-- name: GetUsersByName :many
-SELECT id, first_name, last_name, email, phone_no, address, password, role, created_at, updated_at FROM users WHERE first_name || ' ' || last_name LIKE $1
-`
-
-func (q *Queries) GetUsersByName(ctx context.Context, firstName string) ([]User, error) {
-	rows, err := q.db.QueryContext(ctx, getUsersByName, firstName)
+func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, getUsers,
+		arg.Column1,
+		arg.Column2,
+		arg.Column3,
+		arg.Column4,
+	)
 	if err != nil {
 		return nil, err
 	}

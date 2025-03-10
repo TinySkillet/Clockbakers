@@ -22,16 +22,19 @@ WHERE ID=$6
 RETURNING *;
 
 -- name: GetUsers :many
-SELECT * FROM users;
+SELECT * FROM users
+WHERE 
+  ($1::TEXT = '' OR first_name ILIKE '%' || $1 || '%') AND
+  ($2::TEXT = '' OR last_name ILIKE '%' || $2 || '%') AND
+  ($3::TEXT = '' OR phone_no = $3) AND
+  ($4::TEXT = '' OR email = $4)
+ORDER BY first_name;
 
--- name: GetUsersByName :many
-SELECT * FROM users WHERE first_name || ' ' || last_name LIKE $1;
 
 -- name: GetUserByEmail :one
-SELECT * FROM users WHERE email=$1;
+SELECT * FROM users WHERE email = $1;
+
 
 -- name: GetUserByID :one
 SELECT * FROM users WHERE id=$1;
 
--- name: GetRoleByIdAndEmail :one
-SELECT role FROM users WHERE id=$1 AND email=$2;

@@ -2,6 +2,7 @@ package models
 
 import (
 	"regexp"
+	"time"
 
 	"github.com/TinySkillet/ClockBakers/internal/database"
 	"github.com/go-playground/validator/v10"
@@ -17,6 +18,8 @@ type User struct {
 	Address   string    `json:"address" validate:"required"`
 	Password  string    `json:"password,omitempty" validate:"required,password"`
 	Role      string    `json:"role" validate:"required,role"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func (u *User) Validate() {
@@ -69,6 +72,8 @@ func DBUserToUser(dbUser database.User) User {
 		Address:   dbUser.Address,
 		Password:  "",
 		Role:      string(dbUser.Role),
+		CreatedAt: dbUser.CreatedAt,
+		UpdatedAt: dbUser.UpdatedAt,
 	}
 }
 
