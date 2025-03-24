@@ -9,4 +9,4 @@ CREATE TABLE cart_items (
 );
 
 -- +goose Down
-DROP TABLE cart_items;
+DROP TABLE cart_items;  

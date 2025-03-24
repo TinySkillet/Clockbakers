@@ -149,6 +149,7 @@ type Review struct {
 	Rating    int32
 	Comment   string
 	CreatedAt time.Time
+	UpdatedAt time.Time
 	UserID    uuid.UUID
 	ProductID uuid.UUID
 }

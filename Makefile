@@ -28,3 +28,8 @@ down:
 # sqlc queries gen
 gen:
 	@sqlc generate
+
+
+# swagger
+swagger:
+	@swagger generate spec -o ./handlers/swagger.yaml --scan-models

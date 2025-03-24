@@ -27,6 +27,17 @@ func MiddlewareValidateUser(next apiHandler) http.HandlerFunc {
 			http.Error(w, "Not allowed!"+err.Error(), http.StatusUnauthorized)
 			return
 		}
+
+		query := r.URL.Query()
+		uid := query.Get("uid")
+		// ensures that users can only access their own data
+		if uid != "" {
+			if uid != claims.ID {
+				http.Error(w, "Not allowed! UID mismatch", http.StatusUnauthorized)
+				return
+			}
+		}
+
 		if claims.Role == "customer" || claims.Role == "admin" {
 			next(w, r)
 			return

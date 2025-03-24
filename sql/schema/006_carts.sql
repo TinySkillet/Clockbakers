@@ -5,7 +5,5 @@ CREATE TABLE carts (
  ON DELETE CASCADE
 );
 
-
-
 -- +goose Down
 DROP TABLE carts;

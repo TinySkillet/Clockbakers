@@ -4,19 +4,27 @@ INSERT INTO orders (
   created_at, updated_at, user_id
 ) VALUES (
   $1, $2, $3,
-  CURRENT_TIMESTAMP AT TIME ZONE 'UTC',
-  CURRENT_TIMESTAMP AT TIME ZONE 'UTC',
-  $4
+  $4,
+  $5,
+  $6
 ) RETURNING *;
 
 -- name: GetOrder :one
 SELECT * FROM orders WHERE ID = $1;
 
--- name: ListOrders :many
-SELECT * FROM orders ORDER BY created_at DESC;
+-- name: GetPopularItems :many
+SELECT p.*, COUNT(oi.product_id) AS order_count
+FROM products p
+JOIN order_items oi ON p.ID = oi.product_id
+GROUP BY p.ID
+ORDER BY order_count DESC;
 
--- name: GetOrdersByUserID :many
-SELECT * FROM orders WHERE user_id = $1;
+-- name: ListOrders :many
+SELECT * FROM orders 
+WHERE 
+  ($1 IS NULL OR user_id = $1) AND 
+  ($2 = '' OR status = $2)
+ORDER BY created_at DESC;
 
 -- name: UpdateOrderStatus :one
 UPDATE orders SET 

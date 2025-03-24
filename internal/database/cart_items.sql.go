@@ -13,18 +13,18 @@ import (
 
 const addToCart = `-- name: AddToCart :exec
 INSERT INTO cart_items (
- ID, quantity,
- cart_id, product_id
+  ID, quantity,
+  cart_id, product_id
 ) VALUES (
   $1, $2,
-  $3, $4
+  (SELECT ID FROM carts WHERE user_id = $3 LIMIT 1), $4
 )
 `
 
 type AddToCartParams struct {
 	ID        uuid.UUID
 	Quantity  int32
-	CartID    uuid.UUID
+	UserID    uuid.UUID
 	ProductID uuid.UUID
 }
 
@@ -32,16 +32,19 @@ func (q *Queries) AddToCart(ctx context.Context, arg AddToCartParams) error {
 	_, err := q.db.ExecContext(ctx, addToCart,
 		arg.ID,
 		arg.Quantity,
-		arg.CartID,
+		arg.UserID,
 		arg.ProductID,
 	)
 	return err
 }
 
 const getItemsFromCart = `-- name: GetItemsFromCart :many
-SELECT p.SKU, p.name, p.description, p.price, p.stock_qty, p.category, c.quantity FROM cart_items c INNER JOIN products p ON 
-c.product_id =  p.ID WHERE
-c.cart_id = $1
+SELECT p.SKU, p.name, p.description, p.price,
+       p.stock_qty, p.category, c.quantity 
+FROM cart_items c 
+INNER JOIN products p ON c.product_id = p.ID
+INNER JOIN carts crt ON crt.ID = c.cart_id 
+WHERE crt.user_id = $1
 `
 
 type GetItemsFromCartRow struct {
@@ -54,8 +57,8 @@ type GetItemsFromCartRow struct {
 	Quantity    int32
 }
 
-func (q *Queries) GetItemsFromCart(ctx context.Context, cartID uuid.UUID) ([]GetItemsFromCartRow, error) {
-	rows, err := q.db.QueryContext(ctx, getItemsFromCart, cartID)
+func (q *Queries) GetItemsFromCart(ctx context.Context, userID uuid.UUID) ([]GetItemsFromCartRow, error) {
+	rows, err := q.db.QueryContext(ctx, getItemsFromCart, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -83,4 +86,39 @@ func (q *Queries) GetItemsFromCart(ctx context.Context, cartID uuid.UUID) ([]Get
 		return nil, err
 	}
 	return items, nil
+}
+
+const reduceQuantityFromCart = `-- name: ReduceQuantityFromCart :exec
+UPDATE cart_items
+SET quantity = quantity - $1
+WHERE product_id = $2 
+AND cart_id IN (SELECT cart_id FROM carts WHERE user_id = $3)
+AND quantity > $1
+`
+
+type ReduceQuantityFromCartParams struct {
+	Quantity  int32
+	ProductID uuid.UUID
+	UserID    uuid.UUID
+}
+
+func (q *Queries) ReduceQuantityFromCart(ctx context.Context, arg ReduceQuantityFromCartParams) error {
+	_, err := q.db.ExecContext(ctx, reduceQuantityFromCart, arg.Quantity, arg.ProductID, arg.UserID)
+	return err
+}
+
+const removeFromCart = `-- name: RemoveFromCart :exec
+DELETE FROM cart_items 
+WHERE product_id = $1 
+AND cart_id IN (SELECT ID FROM carts WHERE user_id = $2)
+`
+
+type RemoveFromCartParams struct {
+	ProductID uuid.UUID
+	UserID    uuid.UUID
+}
+
+func (q *Queries) RemoveFromCart(ctx context.Context, arg RemoveFromCartParams) error {
+	_, err := q.db.ExecContext(ctx, removeFromCart, arg.ProductID, arg.UserID)
+	return err
 }

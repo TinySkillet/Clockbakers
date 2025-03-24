@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -17,9 +18,9 @@ INSERT INTO orders (
   created_at, updated_at, user_id
 ) VALUES (
   $1, $2, $3,
-  CURRENT_TIMESTAMP AT TIME ZONE 'UTC',
-  CURRENT_TIMESTAMP AT TIME ZONE 'UTC',
-  $4
+  $4,
+  $5,
+  $6
 ) RETURNING id, status, total_price, created_at, updated_at, user_id
 `
 
@@ -27,6 +28,8 @@ type CreateOrderParams struct {
 	ID         uuid.UUID
 	Status     OrderStatus
 	TotalPrice float32
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 	UserID     uuid.UUID
 }
 
@@ -35,6 +38,8 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 		arg.ID,
 		arg.Status,
 		arg.TotalPrice,
+		arg.CreatedAt,
+		arg.UpdatedAt,
 		arg.UserID,
 	)
 	var i Order
@@ -76,26 +81,47 @@ func (q *Queries) GetOrder(ctx context.Context, id uuid.UUID) (Order, error) {
 	return i, err
 }
 
-const getOrdersByUserID = `-- name: GetOrdersByUserID :many
-SELECT id, status, total_price, created_at, updated_at, user_id FROM orders WHERE user_id = $1
+const getPopularItems = `-- name: GetPopularItems :many
+SELECT p.id, p.sku, p.name, p.description, p.price, p.stock_qty, p.category, p.created_at, p.updated_at, COUNT(oi.product_id) AS order_count
+FROM products p
+JOIN order_items oi ON p.ID = oi.product_id
+GROUP BY p.ID
+ORDER BY order_count DESC
 `
 
-func (q *Queries) GetOrdersByUserID(ctx context.Context, userID uuid.UUID) ([]Order, error) {
-	rows, err := q.db.QueryContext(ctx, getOrdersByUserID, userID)
+type GetPopularItemsRow struct {
+	ID          uuid.UUID
+	Sku         string
+	Name        string
+	Description string
+	Price       float32
+	StockQty    int32
+	Category    string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	OrderCount  int64
+}
+
+func (q *Queries) GetPopularItems(ctx context.Context) ([]GetPopularItemsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getPopularItems)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Order
+	var items []GetPopularItemsRow
 	for rows.Next() {
-		var i Order
+		var i GetPopularItemsRow
 		if err := rows.Scan(
 			&i.ID,
-			&i.Status,
-			&i.TotalPrice,
+			&i.Sku,
+			&i.Name,
+			&i.Description,
+			&i.Price,
+			&i.StockQty,
+			&i.Category,
 			&i.CreatedAt,
 			&i.UpdatedAt,
-			&i.UserID,
+			&i.OrderCount,
 		); err != nil {
 			return nil, err
 		}
@@ -111,11 +137,20 @@ func (q *Queries) GetOrdersByUserID(ctx context.Context, userID uuid.UUID) ([]Or
 }
 
 const listOrders = `-- name: ListOrders :many
-SELECT id, status, total_price, created_at, updated_at, user_id FROM orders ORDER BY created_at DESC
+SELECT id, status, total_price, created_at, updated_at, user_id FROM orders 
+WHERE 
+  ($1 IS NULL OR user_id = $1) AND 
+  ($2 = '' OR status = $2)
+ORDER BY created_at DESC
 `
 
-func (q *Queries) ListOrders(ctx context.Context) ([]Order, error) {
-	rows, err := q.db.QueryContext(ctx, listOrders)
+type ListOrdersParams struct {
+	Column1 interface{}
+	Column2 interface{}
+}
+
+func (q *Queries) ListOrders(ctx context.Context, arg ListOrdersParams) ([]Order, error) {
+	rows, err := q.db.QueryContext(ctx, listOrders, arg.Column1, arg.Column2)
 	if err != nil {
 		return nil, err
 	}

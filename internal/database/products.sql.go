@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -128,22 +129,27 @@ func (q *Queries) GetProducts(ctx context.Context, arg GetProductsParams) ([]Pro
 }
 
 const updateProduct = `-- name: UpdateProduct :one
-UPDATE products SET 
-SKU=$1, name=$2, description=$3,
-price=$4, stock_qty=$5, category=$6,
-updated_at=$7
-WHERE SKU=$1
+UPDATE products
+SET 
+  SKU = COALESCE($1, SKU),
+  name = COALESCE($2, name),
+  description = COALESCE($3, description),
+  price = COALESCE($4, price),
+  stock_qty = COALESCE($5, stock_qty),
+  category = COALESCE($6, category),
+  updated_at = COALESCE($7, updated_at)
+WHERE SKU = $1
 RETURNING id, sku, name, description, price, stock_qty, category, created_at, updated_at
 `
 
 type UpdateProductParams struct {
-	Sku         string
-	Name        string
-	Description string
-	Price       float32
-	StockQty    int32
-	Category    string
-	UpdatedAt   time.Time
+	Sku         sql.NullString  `json:"sku"`
+	Name        sql.NullString  `json:"name"`
+	Description sql.NullString  `json:"description"`
+	Price       sql.NullFloat64 `json:"price"`
+	StockQty    sql.NullInt32   `json:"stock_qty"`
+	Category    sql.NullString  `json:"category"`
+	UpdatedAt   time.Time       `json:"updated_at"`
 }
 
 func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error) {

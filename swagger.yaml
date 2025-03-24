@@ -1,0 +1,736 @@
+definitions:
+    CartItem:
+        properties:
+            id:
+                format: uuid
+                type: string
+                x-go-name: ID
+            product_id:
+                format: uuid
+                type: string
+                x-go-name: ProductID
+            quantity:
+                format: int32
+                type: integer
+                x-go-name: Quantity
+            user_id:
+                format: uuid
+                type: string
+                x-go-name: UserID
+        type: object
+        x-go-package: github.com/TinySkillet/ClockBakers/models
+    Category:
+        properties:
+            category_name:
+                type: string
+                x-go-name: CategoryName
+        type: object
+        x-go-package: github.com/TinySkillet/ClockBakers/models
+    LoginRequest:
+        properties:
+            email:
+                type: string
+                x-go-name: Email
+            password:
+                type: string
+                x-go-name: Password
+        type: object
+        x-go-package: github.com/TinySkillet/ClockBakers/models
+    Order:
+        properties:
+            Status:
+                type: string
+            created_at:
+                format: date-time
+                type: string
+                x-go-name: CreatedAt
+            id:
+                format: uuid
+                type: string
+                x-go-name: ID
+            items:
+                items:
+                    $ref: '#/definitions/OrderItem'
+                type: array
+                x-go-name: Items
+            total_price:
+                format: float
+                type: number
+                x-go-name: TotalPrice
+            updated_at:
+                format: date-time
+                type: string
+                x-go-name: UpdatedAt
+            user_id:
+                format: uuid
+                type: string
+                x-go-name: UserID
+        type: object
+        x-go-package: github.com/TinySkillet/ClockBakers/models
+    OrderItem:
+        properties:
+            id:
+                format: uuid
+                type: string
+                x-go-name: ID
+            order_id:
+                format: uuid
+                type: string
+                x-go-name: OrderID
+            pid:
+                format: uuid
+                type: string
+                x-go-name: ProductID
+            price_at_purchase:
+                format: double
+                type: number
+                x-go-name: PriceAtPurchase
+            quantity:
+                format: int64
+                type: integer
+                x-go-name: Quantity
+        type: object
+        x-go-package: github.com/TinySkillet/ClockBakers/models
+    Product:
+        properties:
+            category:
+                type: string
+                x-go-name: CategoryName
+            created_at:
+                format: date-time
+                type: string
+                x-go-name: CreatedAt
+            description:
+                type: string
+                x-go-name: Description
+            id:
+                format: uuid
+                type: string
+                x-go-name: ID
+            name:
+                type: string
+                x-go-name: Name
+            price:
+                format: double
+                type: number
+                x-go-name: Price
+            sku:
+                type: string
+                x-go-name: SKU
+            stock_qty:
+                format: int64
+                type: integer
+                x-go-name: StockQty
+            updated_at:
+                format: date-time
+                type: string
+                x-go-name: UpdatedAt
+        type: object
+        x-go-package: github.com/TinySkillet/ClockBakers/models
+    Review:
+        properties:
+            comment:
+                type: string
+                x-go-name: Comment
+            created_at:
+                format: date-time
+                type: string
+                x-go-name: CreatedAt
+            id:
+                format: uuid
+                type: string
+                x-go-name: ID
+            product_id:
+                format: uuid
+                type: string
+                x-go-name: ProductID
+            rating:
+                format: int32
+                type: integer
+                x-go-name: Rating
+            user_id:
+                format: uuid
+                type: string
+                x-go-name: UserID
+        type: object
+        x-go-package: github.com/TinySkillet/ClockBakers/models
+    User:
+        properties:
+            address:
+                type: string
+                x-go-name: Address
+            created_at:
+                format: date-time
+                type: string
+                x-go-name: CreatedAt
+            email:
+                type: string
+                x-go-name: Email
+            first_name:
+                type: string
+                x-go-name: FirstName
+            id:
+                format: uuid
+                type: string
+                x-go-name: ID
+            last_name:
+                type: string
+                x-go-name: LastName
+            password:
+                type: string
+                x-go-name: Password
+            phone_no:
+                type: string
+                x-go-name: PhoneNo
+            role:
+                type: string
+                x-go-name: Role
+            updated_at:
+                format: date-time
+                type: string
+                x-go-name: UpdatedAt
+        type: object
+        x-go-package: github.com/TinySkillet/ClockBakers/models
+info: {}
+paths:
+    /cart/items:
+        delete:
+            description: Remove an item from the user's shopping cart
+            operationId: deleteItemFromCart
+            parameters:
+                - description: The product ID of the item to remove
+                  in: query
+                  name: pid
+                  required: true
+                  type: string
+                  x-go-name: ProductID
+                - description: The user ID associated with the cart
+                  in: query
+                  name: uid
+                  required: true
+                  type: string
+                  x-go-name: UserID
+            responses:
+                "200":
+                    $ref: '#/responses/emptyResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - cart
+        post:
+            description: Add an item to the user's shopping cart
+            operationId: addItemToCart
+            parameters:
+                - description: Cart item information
+                  in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/CartItem'
+            responses:
+                "200":
+                    $ref: '#/responses/emptyResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - cart
+        put:
+            description: Reduce the quantity of an item in the user's shopping cart
+            operationId: reduceItemQtyFromCart
+            parameters:
+                - description: The quantity to reduce
+                  in: query
+                  name: qty
+                  required: true
+                  type: string
+                  x-go-name: Quantity
+                - description: The product ID of the item
+                  in: query
+                  name: pid
+                  required: true
+                  type: string
+                  x-go-name: ProductID
+                - description: The user ID associated with the cart
+                  in: query
+                  name: uid
+                  required: true
+                  type: string
+                  x-go-name: UserID
+            responses:
+                "200":
+                    $ref: '#/responses/emptyResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - cart
+    /categories:
+        delete:
+            description: Delete an existing product category
+            operationId: deleteCategory
+            parameters:
+                - description: The name of the category to delete
+                  in: query
+                  name: category
+                  required: true
+                  type: string
+                  x-go-name: Category
+            responses:
+                "200":
+                    $ref: '#/responses/emptyResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - categories
+        get:
+            description: Get all product categories
+            operationId: getCategories
+            responses:
+                "200":
+                    $ref: '#/responses/categoriesResponse'
+                "500":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - categories
+        post:
+            description: Create a new product category
+            operationId: createCategory
+            parameters:
+                - description: Category information
+                  in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/Category'
+            responses:
+                "201":
+                    $ref: '#/responses/categoryResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - categories
+        put:
+            description: Update an existing product category
+            operationId: updateCategory
+            parameters:
+                - description: The current name of the category
+                  in: query
+                  name: old-cat
+                  required: true
+                  type: string
+                  x-go-name: OldCategory
+                - description: The new name for the category
+                  in: query
+                  name: new-cat
+                  required: true
+                  type: string
+                  x-go-name: NewCategory
+            responses:
+                "200":
+                    $ref: '#/responses/categoryResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - categories
+    /error:
+        get:
+            description: Test error handling
+            operationId: error
+            responses:
+                "400":
+                    $ref: '#/responses/emptyResponse'
+            tags:
+                - system
+    /healthz:
+        get:
+            description: Check if the API server is running
+            operationId: healthz
+            responses:
+                "200":
+                    $ref: '#/responses/emptyResponse'
+            tags:
+                - system
+    /login:
+        post:
+            description: Login to the application
+            operationId: login
+            parameters:
+                - description: Login credentials
+                  in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/LoginRequest'
+            responses:
+                "202":
+                    $ref: '#/responses/loginResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+                "401":
+                    $ref: '#/responses/errorResponse'
+                "500":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - auth
+    /orders:
+        delete:
+            description: Delete an existing order
+            operationId: deleteOrder
+            parameters:
+                - description: The ID of the order to delete
+                  in: query
+                  name: id
+                  required: true
+                  type: string
+                  x-go-name: ID
+            responses:
+                "200":
+                    $ref: '#/responses/emptyResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+                "500":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - orders
+        post:
+            description: Create a new order from cart items
+            operationId: createOrder
+            parameters:
+                - description: Order information including items
+                  in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/Order'
+            responses:
+                "201":
+                    $ref: '#/responses/orderResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+                "500":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - orders
+        put:
+            description: Update the status of an existing order
+            operationId: updateOrderStatus
+            parameters:
+                - description: The ID of the order to update
+                  in: query
+                  name: id
+                  required: true
+                  type: string
+                  x-go-name: ID
+                - description: The updated order status
+                  in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/Order'
+            responses:
+                "200":
+                    $ref: '#/responses/orderResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+                "500":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - orders
+    /products:
+        delete:
+            description: Delete an existing product
+            operationId: deleteProduct
+            parameters:
+                - description: The SKU of the product to delete
+                  in: query
+                  name: sku
+                  required: true
+                  type: string
+                  x-go-name: SKU
+            responses:
+                "200":
+                    $ref: '#/responses/emptyResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - products
+        get:
+            description: Get products with optional filters
+            operationId: getProducts
+            parameters:
+                - description: Product name filter
+                  in: query
+                  name: name
+                  type: string
+                  x-go-name: Name
+                - description: Category filter
+                  in: query
+                  name: category
+                  type: string
+                  x-go-name: Category
+                - description: Minimum price filter
+                  format: double
+                  in: query
+                  name: min-price
+                  type: number
+                  x-go-name: MinPrice
+                - description: Maximum price filter
+                  format: double
+                  in: query
+                  name: max-price
+                  type: number
+                  x-go-name: MaxPrice
+            responses:
+                "200":
+                    $ref: '#/responses/productsResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - products
+        post:
+            description: Create a new product
+            operationId: createProduct
+            parameters:
+                - description: Product information
+                  in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/Product'
+            responses:
+                "201":
+                    $ref: '#/responses/productResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - products
+        put:
+            description: Update an existing product
+            operationId: updateProduct
+            parameters:
+                - description: Product information to update
+                  in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/Product'
+            responses:
+                "200":
+                    $ref: '#/responses/productResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - products
+    /reviews:
+        delete:
+            description: Delete an existing product review
+            operationId: deleteReview
+            parameters:
+                - description: The ID of the review to delete
+                  in: query
+                  name: id
+                  required: true
+                  type: string
+                  x-go-name: ID
+            responses:
+                "200":
+                    $ref: '#/responses/emptyResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+                "500":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - reviews
+        post:
+            description: Create a new product review
+            operationId: createReview
+            parameters:
+                - description: Review information
+                  in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/Review'
+            responses:
+                "201":
+                    $ref: '#/responses/reviewResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - reviews
+        put:
+            description: Update an existing product review
+            operationId: updateReview
+            parameters:
+                - description: Review information to update
+                  in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/Review'
+            responses:
+                "200":
+                    $ref: '#/responses/reviewResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+                "500":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - reviews
+    /users:
+        get:
+            description: Get users with optional filters
+            operationId: getUsers
+            parameters:
+                - description: First name filter
+                  in: query
+                  name: first-name
+                  type: string
+                  x-go-name: FirstName
+                - description: Last name filter
+                  in: query
+                  name: last-name
+                  type: string
+                  x-go-name: LastName
+                - description: Phone number filter
+                  in: query
+                  name: phone-no
+                  type: string
+                  x-go-name: PhoneNo
+                - description: Email filter
+                  in: query
+                  name: email
+                  type: string
+                  x-go-name: Email
+            responses:
+                "200":
+                    $ref: '#/responses/usersResponse'
+                "404":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - users
+        post:
+            description: Create a new user account
+            operationId: createUser
+            parameters:
+                - description: User information for registration
+                  in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/User'
+            responses:
+                "201":
+                    $ref: '#/responses/userResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+                "500":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - users
+        put:
+            description: Update an existing user's information
+            operationId: updateUser
+            parameters:
+                - description: The ID of the user to update
+                  in: query
+                  name: uid
+                  required: true
+                  type: string
+                  x-go-name: UserID
+                - description: User information to update
+                  in: body
+                  name: Body
+                  required: true
+                  schema:
+                    $ref: '#/definitions/User'
+            responses:
+                "200":
+                    $ref: '#/responses/userResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - users
+    /users/{id}:
+        get:
+            description: Get a user by their ID
+            operationId: getUserById
+            parameters:
+                - description: User ID
+                  in: query
+                  name: id
+                  required: true
+                  type: string
+                  x-go-name: ID
+            responses:
+                "302":
+                    $ref: '#/responses/userResponse'
+                "400":
+                    $ref: '#/responses/errorResponse'
+                "404":
+                    $ref: '#/responses/errorResponse'
+            tags:
+                - users
+responses:
+    categoriesResponse:
+        description: ""
+        schema:
+            items:
+                type: string
+            type: array
+    categoryResponse:
+        description: ""
+        schema:
+            properties:
+                category_name:
+                    type: string
+                    x-go-name: Category
+            type: object
+    emptyResponse:
+        description: ""
+        schema:
+            type: object
+    errorResponse:
+        description: ""
+        schema:
+            properties:
+                error:
+                    type: string
+                    x-go-name: Error
+            type: object
+    loginResponse:
+        description: ""
+        headers:
+            Authorization:
+                description: |-
+                    Authorization token in header
+                    in: header
+                type: string
+    orderResponse:
+        description: ""
+        schema:
+            $ref: '#/definitions/Order'
+    productResponse:
+        description: ""
+        schema:
+            $ref: '#/definitions/Product'
+    productsResponse:
+        description: ""
+        schema:
+            items:
+                $ref: '#/definitions/Product'
+            type: array
+    reviewResponse:
+        description: ""
+        schema:
+            $ref: '#/definitions/Review'
+    userResponse:
+        description: ""
+        schema:
+            $ref: '#/definitions/User'
+    usersResponse:
+        description: ""
+        schema:
+            items:
+                $ref: '#/definitions/User'
+            type: array
+swagger: "2.0"

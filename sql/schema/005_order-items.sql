@@ -8,6 +8,5 @@ CREATE TABLE order_items (
   ON DELETE CASCADE
 );
 
-
 -- +goose Down
 DROP TABLE order_items;

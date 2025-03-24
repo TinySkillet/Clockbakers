@@ -23,9 +23,14 @@ ORDER BY name;
 DELETE FROM products WHERE SKU=$1;
 
 -- name: UpdateProduct :one
-UPDATE products SET 
-SKU=$1, name=$2, description=$3,
-price=$4, stock_qty=$5, category=$6,
-updated_at=$7
-WHERE SKU=$1
+UPDATE products
+SET 
+  SKU = COALESCE($1, SKU),
+  name = COALESCE($2, name),
+  description = COALESCE($3, description),
+  price = COALESCE($4, price),
+  stock_qty = COALESCE($5, stock_qty),
+  category = COALESCE($6, category),
+  updated_at = COALESCE($7, updated_at)
+WHERE SKU = $1
 RETURNING *;

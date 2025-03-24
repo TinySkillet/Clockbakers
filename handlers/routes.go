@@ -10,6 +10,7 @@ import (
 
 	m "github.com/TinySkillet/ClockBakers/middlewares"
 	s "github.com/TinySkillet/ClockBakers/storage"
+	"github.com/go-openapi/runtime/middleware"
 	"github.com/gorilla/mux"
 )
 
@@ -31,11 +32,10 @@ func (a *APIServer) Run() {
 	v1Router := router.PathPrefix("/v1").Subrouter()
 
 	// cors middleware
-	v1Router.Use(m.CorsMiddleware)
+	router.Use(m.CorsMiddleware)
 
 	// sub router for get methods, get requests are routed to this router
 	getRouter := v1Router.Methods(http.MethodGet).Subrouter()
-
 	getRouter.HandleFunc("/healthz", a.HandleHealthz)
 	getRouter.HandleFunc("/error", a.HandleError)
 	getRouter.HandleFunc("/users", m.MiddlewareValidateAdmin(a.HandleGetUsers))
@@ -44,7 +44,6 @@ func (a *APIServer) Run() {
 
 	// sub router for post methods, post requests are routed to this router
 	postRouter := v1Router.Methods(http.MethodPost).Subrouter()
-
 	postRouter.HandleFunc("/login", a.HandleLogin)
 	postRouter.HandleFunc("/user", a.HandleCreateUser)
 	postRouter.HandleFunc("/category", m.MiddlewareValidateAdmin(a.HandleCreateCategory))
@@ -58,9 +57,19 @@ func (a *APIServer) Run() {
 
 	// sub router for delete methods, put requests are routed to this router
 	deleteRouter := v1Router.Methods(http.MethodDelete).Subrouter()
-
 	deleteRouter.HandleFunc("/category", m.MiddlewareValidateAdmin(a.HandleDeleteCategory))
 	deleteRouter.HandleFunc("/product", m.MiddlewareValidateAdmin(a.HandleDeleteProduct))
+
+	// serve swagger.yaml from the root directory
+	router.HandleFunc("/swagger.yaml", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./swagger.yaml")
+	})
+
+	// serve swagger documentation with Redoc
+	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
+	sh := middleware.Redoc(opts, nil)
+
+	router.Handle("/docs", sh)
 
 	// api server
 	server := http.Server{
