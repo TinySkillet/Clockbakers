@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// swagger:route PUT /users users updateUser
+// swagger:route PUT /v1/user users updateUser
 // Update an existing user's information
 // responses:
 //   200: userResponse
@@ -65,7 +65,7 @@ func (a *APIServer) HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	m.RespondWithJSON(w, updatedUser, http.StatusOK)
 }
 
-// swagger:route PUT /categories categories updateCategory
+// swagger:route PUT /v1/category category updateCategory
 // Update an existing product category
 // responses:
 //   200: categoryResponse
@@ -110,7 +110,7 @@ func (a *APIServer) HandleUpdateCategory(w http.ResponseWriter, r *http.Request)
 	m.RespondWithJSON(w, updatedCat, http.StatusOK)
 }
 
-// swagger:route PUT /products products updateProduct
+// swagger:route PUT /v1/product product updateProduct
 // Update an existing product
 // responses:
 //   200: productResponse
@@ -166,7 +166,7 @@ func (a *APIServer) HandleUpdateProduct(w http.ResponseWriter, r *http.Request) 
 	m.RespondWithJSON(w, updatedProduct, http.StatusOK)
 }
 
-// swagger:route PUT /cart/items cart reduceItemQtyFromCart
+// swagger:route PUT /v1/cart cart reduceItemQtyFromCart
 // Reduce the quantity of an item in the user's shopping cart
 // responses:
 //   200: emptyResponse
@@ -228,7 +228,7 @@ func (a *APIServer) HandleReduceItemQtyFromCart(w http.ResponseWriter, r *http.R
 	m.RespondWithJSON(w, struct{}{}, http.StatusOK)
 }
 
-// swagger:route PUT /orders orders updateOrderStatus
+// swagger:route PUT /v1/order order updateOrderStatus
 // Update the status of an existing order
 // responses:
 //   200: orderResponse
@@ -279,7 +279,7 @@ func (a *APIServer) HandleUpdateOrderStatus(w http.ResponseWriter, r *http.Reque
 	m.RespondWithJSON(w, order, http.StatusOK)
 }
 
-// swagger:route PUT /reviews reviews updateReview
+// swagger:route PUT /v1/review review updateReview
 // Update an existing product review
 // responses:
 //   200: reviewResponse
@@ -288,16 +288,46 @@ func (a *APIServer) HandleUpdateOrderStatus(w http.ResponseWriter, r *http.Reque
 
 // swagger:parameters updateReview
 type updateReviewParams struct {
-	// Review information to update
+	// The Rating of the Review
 	// in: body
+	// name: rating
+	// description: Rating of the review to update
 	// required: true
-	Body m.Review
+	// type: int
+	// format: int
+	Rating int32 `json:"rating"`
+
+	// The Review Comment
+	// in: body
+	// name: comment
+	// description: Comment of the review to update
+	// required: true
+	// type: string
+	// format: uuid
+	Comment string `json:"comment"`
 }
 
 // HandleUpdateReview updates a product review
 func (a *APIServer) HandleUpdateReview(w http.ResponseWriter, r *http.Request) {
+
+	query := r.URL.Query()
+	review_id := query.Get("review_id")
+	user_id := query.Get("user_id")
+
+	id, err := uuid.Parse(review_id)
+	if err != nil {
+		m.RespondWithError(w, "Invalid review id!", http.StatusBadRequest)
+		return
+	}
+
+	uid, err := uuid.Parse(user_id)
+	if err != nil {
+		m.RespondWithError(w, "Invalid user id!", http.StatusBadRequest)
+		return
+	}
+
 	params := m.Review{}
-	err := m.FromJSON(r, &params)
+	err = m.FromJSON(r, &params)
 	if err != nil {
 		m.RespondWithError(w, "Invalid JSON params!"+err.Error(), http.StatusBadRequest)
 		return
@@ -305,7 +335,8 @@ func (a *APIServer) HandleUpdateReview(w http.ResponseWriter, r *http.Request) {
 
 	queries := a.getQueries()
 	dbReview, err := queries.UpdateReview(r.Context(), database.UpdateReviewParams{
-		ID:        params.ID,
+		ID:        id,
+		UserID:    uid,
 		Rating:    params.Rating,
 		Comment:   params.Comment,
 		UpdatedAt: time.Now().UTC(),

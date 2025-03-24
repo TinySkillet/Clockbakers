@@ -52,11 +52,16 @@ func (q *Queries) CreateReview(ctx context.Context, arg CreateReviewParams) (Rev
 }
 
 const deleteReview = `-- name: DeleteReview :exec
-DELETE FROM reviews WHERE id = $1
+DELETE FROM reviews WHERE id = $1 AND user_id = $2
 `
 
-func (q *Queries) DeleteReview(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.ExecContext(ctx, deleteReview, id)
+type DeleteReviewParams struct {
+	ID     uuid.UUID
+	UserID uuid.UUID
+}
+
+func (q *Queries) DeleteReview(ctx context.Context, arg DeleteReviewParams) error {
+	_, err := q.db.ExecContext(ctx, deleteReview, arg.ID, arg.UserID)
 	return err
 }
 
@@ -108,13 +113,15 @@ func (q *Queries) GetReviews(ctx context.Context, arg GetReviewsParams) ([]Revie
 
 const updateReview = `-- name: UpdateReview :one
 UPDATE reviews
-SET rating = $2, comment = $3, updated_at = $4
+SET rating = $3, comment = $4, updated_at = $5
 WHERE id = $1
+AND user_id = $2
 RETURNING id, rating, comment, created_at, updated_at, user_id, product_id
 `
 
 type UpdateReviewParams struct {
 	ID        uuid.UUID
+	UserID    uuid.UUID
 	Rating    int32
 	Comment   string
 	UpdatedAt time.Time
@@ -123,6 +130,7 @@ type UpdateReviewParams struct {
 func (q *Queries) UpdateReview(ctx context.Context, arg UpdateReviewParams) (Review, error) {
 	row := q.db.QueryRowContext(ctx, updateReview,
 		arg.ID,
+		arg.UserID,
 		arg.Rating,
 		arg.Comment,
 		arg.UpdatedAt,

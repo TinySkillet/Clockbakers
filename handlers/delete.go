@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// swagger:route DELETE /categories categories deleteCategory
+// swagger:route DELETE /v1/category category deleteCategory
 // Delete an existing product category
 // responses:
 //   200: emptyResponse
@@ -40,7 +40,7 @@ func (a *APIServer) HandleDeleteCategory(w http.ResponseWriter, r *http.Request)
 	m.RespondWithJSON(w, struct{}{}, http.StatusOK)
 }
 
-// swagger:route DELETE /products products deleteProduct
+// swagger:route DELETE /v1/product product deleteProduct
 // Delete an existing product
 // responses:
 //   200: emptyResponse
@@ -72,7 +72,7 @@ func (a *APIServer) HandleDeleteProduct(w http.ResponseWriter, r *http.Request) 
 	m.RespondWithJSON(w, struct{}{}, http.StatusOK)
 }
 
-// swagger:route DELETE /cart/items cart deleteItemFromCart
+// swagger:route DELETE /v1/cart cart deleteItemFromCart
 // Remove an item from the user's shopping cart
 // responses:
 //   200: emptyResponse
@@ -121,7 +121,7 @@ func (a *APIServer) HandleDeleteItemFromCart(w http.ResponseWriter, r *http.Requ
 	m.RespondWithJSON(w, struct{}{}, http.StatusOK)
 }
 
-// swagger:route DELETE /orders orders deleteOrder
+// swagger:route DELETE /v1/order order deleteOrder
 // Delete an existing order
 // responses:
 //   200: emptyResponse
@@ -157,7 +157,7 @@ func (a *APIServer) HandleDeleteOrder(w http.ResponseWriter, r *http.Request) {
 	m.RespondWithJSON(w, struct{}{}, http.StatusOK)
 }
 
-// swagger:route DELETE /reviews reviews deleteReview
+// swagger:route DELETE /v1/review review deleteReview
 // Delete an existing product review
 // responses:
 //   200: emptyResponse
@@ -177,14 +177,24 @@ func (a *APIServer) HandleDeleteReview(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 
 	review_id := query.Get("id")
+	user_id := query.Get("uid")
 	id, err := uuid.Parse(review_id)
 	if err != nil {
 		m.RespondWithError(w, "Invalid review id!", http.StatusBadRequest)
 		return
 	}
 
+	uid, err := uuid.Parse(user_id)
+	if err != nil {
+		m.RespondWithError(w, "Invalid user id!", http.StatusBadRequest)
+		return
+	}
+
 	queries := a.getQueries()
-	err = queries.DeleteReview(r.Context(), id)
+	err = queries.DeleteReview(r.Context(), database.DeleteReviewParams{
+		ID:     id,
+		UserID: uid,
+	})
 	if err != nil {
 		m.RespondWithError(w, "Failed to delete review!", http.StatusInternalServerError)
 		return

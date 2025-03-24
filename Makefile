@@ -32,4 +32,4 @@ gen:
 
 # swagger
 swagger:
-	@swagger generate spec -o ./handlers/swagger.yaml --scan-models
+	@swagger generate spec -o ./swagger.json --scan-models

@@ -1,0 +1,1255 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "Documentation for Clockbakers API",
+    "title": "Clockbakers API",
+    "version": "1.0.0"
+  },
+  "basePath": "/v1/",
+  "paths": {
+    "/v1/cart": {
+      "put": {
+        "description": "Reduce the quantity of an item in the user's shopping cart",
+        "tags": [
+          "cart"
+        ],
+        "operationId": "reduceItemQtyFromCart",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "Quantity",
+            "description": "The quantity to reduce",
+            "name": "qty",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "ProductID",
+            "description": "The product ID of the item",
+            "name": "pid",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "UserID",
+            "description": "The user ID associated with the cart",
+            "name": "uid",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
+      "post": {
+        "description": "Add an item to the user's shopping cart",
+        "tags": [
+          "cart"
+        ],
+        "operationId": "addItemToCart",
+        "parameters": [
+          {
+            "description": "Cart item information",
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CartItem"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
+      "delete": {
+        "description": "Remove an item from the user's shopping cart",
+        "tags": [
+          "cart"
+        ],
+        "operationId": "deleteItemFromCart",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ProductID",
+            "description": "The product ID of the item to remove",
+            "name": "pid",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "UserID",
+            "description": "The user ID associated with the cart",
+            "name": "uid",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/v1/categories": {
+      "get": {
+        "description": "Get all product categories",
+        "tags": [
+          "categories"
+        ],
+        "operationId": "getCategories",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/categoriesResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/v1/category": {
+      "put": {
+        "description": "Update an existing product category",
+        "tags": [
+          "category"
+        ],
+        "operationId": "updateCategory",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "OldCategory",
+            "description": "The current name of the category",
+            "name": "old-cat",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "NewCategory",
+            "description": "The new name for the category",
+            "name": "new-cat",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/categoryResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
+      "post": {
+        "description": "Create a new product category",
+        "tags": [
+          "category"
+        ],
+        "operationId": "createCategory",
+        "parameters": [
+          {
+            "description": "Category information",
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Category"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/categoryResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete an existing product category",
+        "tags": [
+          "category"
+        ],
+        "operationId": "deleteCategory",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "Category",
+            "description": "The name of the category to delete",
+            "name": "category",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/v1/error": {
+      "get": {
+        "description": "Test error handling",
+        "tags": [
+          "system"
+        ],
+        "operationId": "error",
+        "responses": {
+          "400": {
+            "$ref": "#/responses/emptyResponse"
+          }
+        }
+      }
+    },
+    "/v1/healthz": {
+      "get": {
+        "description": "Check if the API server is running",
+        "tags": [
+          "system"
+        ],
+        "operationId": "healthz",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/emptyResponse"
+          }
+        }
+      }
+    },
+    "/v1/login": {
+      "post": {
+        "description": "Login to the application",
+        "tags": [
+          "auth"
+        ],
+        "operationId": "login",
+        "parameters": [
+          {
+            "description": "Login credentials",
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginRequest"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "$ref": "#/responses/loginResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "401": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/v1/order": {
+      "put": {
+        "description": "Update the status of an existing order",
+        "tags": [
+          "order"
+        ],
+        "operationId": "updateOrderStatus",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "The ID of the order to update",
+            "name": "id",
+            "in": "query",
+            "required": true
+          },
+          {
+            "description": "The updated order status",
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Order"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/orderResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
+      "post": {
+        "description": "Create a new order from cart items",
+        "tags": [
+          "order"
+        ],
+        "operationId": "createOrder",
+        "parameters": [
+          {
+            "description": "Order information including items",
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Order"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/orderResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete an existing order",
+        "tags": [
+          "order"
+        ],
+        "operationId": "deleteOrder",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "The ID of the order to delete",
+            "name": "id",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/v1/orders": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Retrieve orders. You can filter by user ID and/or order status. If no parameters are provided, all orders are returned.",
+        "operationId": "listOrders",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "UID",
+            "description": "Filter orders by user ID",
+            "name": "uid",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "Status",
+            "description": "Filter orders by status",
+            "name": "status",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/ordersResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/v1/product": {
+      "put": {
+        "description": "Update an existing product",
+        "tags": [
+          "product"
+        ],
+        "operationId": "updateProduct",
+        "parameters": [
+          {
+            "description": "Product information to update",
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/productResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
+      "post": {
+        "description": "Create a new product",
+        "tags": [
+          "product"
+        ],
+        "operationId": "createProduct",
+        "parameters": [
+          {
+            "description": "Product information",
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/productResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete an existing product",
+        "tags": [
+          "product"
+        ],
+        "operationId": "deleteProduct",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "SKU",
+            "description": "The SKU of the product to delete",
+            "name": "sku",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/v1/products": {
+      "get": {
+        "description": "Get products with optional filters",
+        "tags": [
+          "products"
+        ],
+        "operationId": "getProducts",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "Name",
+            "description": "Product name filter",
+            "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "Category",
+            "description": "Category filter",
+            "name": "category",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "format": "double",
+            "x-go-name": "MinPrice",
+            "description": "Minimum price filter",
+            "name": "min-price",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "format": "double",
+            "x-go-name": "MaxPrice",
+            "description": "Maximum price filter",
+            "name": "max-price",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/productsResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/v1/products/popular": {
+      "get": {
+        "description": "Returns a list of the most popular items based on sales or views",
+        "tags": [
+          "items"
+        ],
+        "operationId": "getPopularItems",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/popularItemsResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/v1/review": {
+      "put": {
+        "description": "Update an existing product review",
+        "tags": [
+          "review"
+        ],
+        "operationId": "updateReview",
+        "parameters": [
+          {
+            "x-go-name": "Rating",
+            "description": "The Rating of the Review",
+            "name": "rating",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "x-go-name": "Comment",
+            "description": "The Review Comment",
+            "name": "comment",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/reviewResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
+      "post": {
+        "description": "Create a new product review",
+        "tags": [
+          "review"
+        ],
+        "operationId": "createReview",
+        "parameters": [
+          {
+            "description": "Review information",
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Review"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/reviewResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete an existing product review",
+        "tags": [
+          "review"
+        ],
+        "operationId": "deleteReview",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "The ID of the review to delete",
+            "name": "id",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/v1/reviews": {
+      "get": {
+        "tags": [
+          "reviews"
+        ],
+        "summary": "Retrieve reviews. You can filter by product ID, review ID, or user ID. If no parameters are provided, all reviews are returned.",
+        "operationId": "getReviews",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "PID",
+            "description": "Filter reviews by product ID",
+            "name": "pid",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "Filter reviews by review ID",
+            "name": "id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "UID",
+            "description": "Filter reviews by user ID",
+            "name": "uid",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/reviewsResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/v1/user": {
+      "put": {
+        "description": "Update an existing user's information",
+        "tags": [
+          "users"
+        ],
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "UserID",
+            "description": "The ID of the user to update",
+            "name": "uid",
+            "in": "query",
+            "required": true
+          },
+          {
+            "description": "User information to update",
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/userResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
+      "post": {
+        "description": "Create a new user account",
+        "tags": [
+          "user"
+        ],
+        "operationId": "createUser",
+        "parameters": [
+          {
+            "description": "User information for registration",
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/userResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/v1/users": {
+      "get": {
+        "description": "Get users with optional filters",
+        "tags": [
+          "users"
+        ],
+        "operationId": "getUsers",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "FirstName",
+            "description": "First name filter",
+            "name": "first-name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "LastName",
+            "description": "Last name filter",
+            "name": "last-name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "PhoneNo",
+            "description": "Phone number filter",
+            "name": "phone-no",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "x-go-name": "Email",
+            "description": "Email filter",
+            "name": "email",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/usersResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/v1/users/{id}": {
+      "get": {
+        "description": "Get a user by their ID",
+        "tags": [
+          "users"
+        ],
+        "operationId": "getUserById",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "User ID",
+            "name": "id",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/usersResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "CartItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "ID"
+        },
+        "product_id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "ProductID"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int32",
+          "x-go-name": "Quantity"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "UserID"
+        }
+      },
+      "x-go-package": "github.com/TinySkillet/ClockBakers/models"
+    },
+    "Category": {
+      "type": "object",
+      "properties": {
+        "category_name": {
+          "type": "string",
+          "x-go-name": "CategoryName"
+        }
+      },
+      "x-go-package": "github.com/TinySkillet/ClockBakers/models"
+    },
+    "LoginRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "password": {
+          "type": "string",
+          "x-go-name": "Password"
+        }
+      },
+      "x-go-package": "github.com/TinySkillet/ClockBakers/models"
+    },
+    "Order": {
+      "type": "object",
+      "properties": {
+        "Status": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "ID"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OrderItem"
+          },
+          "x-go-name": "Items"
+        },
+        "total_price": {
+          "type": "number",
+          "format": "float",
+          "x-go-name": "TotalPrice"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "UpdatedAt"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "UserID"
+        }
+      },
+      "x-go-package": "github.com/TinySkillet/ClockBakers/models"
+    },
+    "OrderItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "ID"
+        },
+        "order_id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "OrderID"
+        },
+        "pid": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "ProductID"
+        },
+        "price_at_purchase": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "PriceAtPurchase"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Quantity"
+        }
+      },
+      "x-go-package": "github.com/TinySkillet/ClockBakers/models"
+    },
+    "PopularProduct": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "x-go-name": "CategoryName"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "description": {
+          "type": "string",
+          "x-go-name": "Description"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "ID"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "order_count": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "OrderCount"
+        },
+        "price": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Price"
+        },
+        "sku": {
+          "type": "string",
+          "x-go-name": "SKU"
+        },
+        "stock_qty": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "StockQty"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "UpdatedAt"
+        }
+      },
+      "x-go-package": "github.com/TinySkillet/ClockBakers/models"
+    },
+    "Product": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "x-go-name": "CategoryName"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "description": {
+          "type": "string",
+          "x-go-name": "Description"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "ID"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "price": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Price"
+        },
+        "sku": {
+          "type": "string",
+          "x-go-name": "SKU"
+        },
+        "stock_qty": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "StockQty"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "UpdatedAt"
+        }
+      },
+      "x-go-package": "github.com/TinySkillet/ClockBakers/models"
+    },
+    "Review": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string",
+          "x-go-name": "Comment"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "ID"
+        },
+        "product_id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "ProductID"
+        },
+        "rating": {
+          "type": "integer",
+          "format": "int32",
+          "x-go-name": "Rating"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "UserID"
+        }
+      },
+      "x-go-package": "github.com/TinySkillet/ClockBakers/models"
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string",
+          "x-go-name": "Address"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "CreatedAt"
+        },
+        "email": {
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "first_name": {
+          "type": "string",
+          "x-go-name": "FirstName"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "ID"
+        },
+        "last_name": {
+          "type": "string",
+          "x-go-name": "LastName"
+        },
+        "password": {
+          "type": "string",
+          "x-go-name": "Password"
+        },
+        "phone_no": {
+          "type": "string",
+          "x-go-name": "PhoneNo"
+        },
+        "role": {
+          "type": "string",
+          "x-go-name": "Role"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "UpdatedAt"
+        }
+      },
+      "x-go-package": "github.com/TinySkillet/ClockBakers/models"
+    }
+  },
+  "responses": {
+    "categoriesResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "categoryResponse": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "category_name": {
+            "type": "string",
+            "x-go-name": "Category"
+          }
+        }
+      }
+    },
+    "emptyResponse": {
+      "description": "",
+      "schema": {
+        "type": "object"
+      }
+    },
+    "errorResponse": {
+      "description": "",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "x-go-name": "Error"
+          }
+        }
+      }
+    },
+    "loginResponse": {
+      "description": "",
+      "headers": {
+        "Authorization": {
+          "type": "string",
+          "description": "Authorization token in header\nin: header"
+        }
+      }
+    },
+    "orderResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Order"
+      }
+    },
+    "popularItemsResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/PopularProduct"
+        }
+      }
+    },
+    "productResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Product"
+      }
+    },
+    "productsResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Product"
+        }
+      }
+    },
+    "reviewResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Review"
+      }
+    },
+    "userResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/User"
+      }
+    },
+    "usersResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    }
+  }
+}

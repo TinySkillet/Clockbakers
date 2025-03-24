@@ -21,7 +21,7 @@ func (a *APIServer) getQueries() *database.Queries {
 	return database.New(store.DB)
 }
 
-// swagger:route POST /login auth login
+// swagger:route POST /v1/login auth login
 // Login to the application
 // responses:
 //   202: loginResponse
@@ -90,7 +90,7 @@ func (a *APIServer) HandleLogin(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 }
 
-// swagger:route POST /users users createUser
+// swagger:route POST /v1/user user createUser
 // Create a new user account
 // responses:
 //   201: userResponse
@@ -164,7 +164,7 @@ func (a *APIServer) HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 	m.RespondWithJSON(w, user, http.StatusCreated)
 }
 
-// swagger:route POST /categories categories createCategory
+// swagger:route POST /v1/category category createCategory
 // Create a new product category
 // responses:
 //   201: categoryResponse
@@ -210,7 +210,7 @@ func (a *APIServer) HandleCreateCategory(w http.ResponseWriter, r *http.Request)
 	}{Category: cat}, http.StatusCreated)
 }
 
-// swagger:route POST /products products createProduct
+// swagger:route POST /v1/product product createProduct
 // Create a new product
 // responses:
 //   201: productResponse
@@ -262,7 +262,7 @@ func (a *APIServer) HandleCreateProduct(w http.ResponseWriter, r *http.Request) 
 	m.RespondWithJSON(w, product, http.StatusCreated)
 }
 
-// swagger:route POST /cart/items cart addItemToCart
+// swagger:route POST /v1/cart cart addItemToCart
 // Add an item to the user's shopping cart
 // responses:
 //   200: emptyResponse
@@ -310,7 +310,7 @@ func (a *APIServer) HandleInsertItemInCart(w http.ResponseWriter, r *http.Reques
 	m.RespondWithJSON(w, struct{}{}, http.StatusOK)
 }
 
-// swagger:route POST /orders orders createOrder
+// swagger:route POST /v1/order order createOrder
 // Create a new order from cart items
 // responses:
 //   201: orderResponse
@@ -377,7 +377,7 @@ func (a *APIServer) HandleCreateOrder(w http.ResponseWriter, r *http.Request) {
 	m.RespondWithJSON(w, order, http.StatusCreated)
 }
 
-// swagger:route POST /reviews reviews createReview
+// swagger:route POST /v1/review review createReview
 // Create a new product review
 // responses:
 //   201: reviewResponse
@@ -408,7 +408,7 @@ type errorResponseWrapper struct {
 }
 
 // CreateReview adds a new product review from a user
-func (a *APIServer) CreateReview(w http.ResponseWriter, r *http.Request) {
+func (a *APIServer) HandleCreateReview(w http.ResponseWriter, r *http.Request) {
 	params := m.Review{}
 	err := m.FromJSON(r, &params)
 	if err != nil {

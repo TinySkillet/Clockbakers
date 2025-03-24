@@ -13,9 +13,10 @@ ORDER BY created_at DESC;
 
 -- name: UpdateReview :one
 UPDATE reviews
-SET rating = $2, comment = $3, updated_at = $4
+SET rating = $3, comment = $4, updated_at = $5
 WHERE id = $1
+AND user_id = $2
 RETURNING *;
 
 -- name: DeleteReview :exec
-DELETE FROM reviews WHERE id = $1;
+DELETE FROM reviews WHERE id = $1 AND user_id = $2;

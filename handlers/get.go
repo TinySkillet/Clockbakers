@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// swagger:route GET /healthz system healthz
+// swagger:route GET /v1/healthz system healthz
 // Check if the API server is running
 // responses:
 //   200: emptyResponse
@@ -22,7 +22,7 @@ func (a *APIServer) HandleHealthz(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(struct{}{})
 }
 
-// swagger:route GET /error system error
+// swagger:route GET /v1/error system error
 // Test error handling
 // responses:
 //   400: emptyResponse
@@ -34,10 +34,10 @@ func (a *APIServer) HandleError(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(struct{}{})
 }
 
-// swagger:route GET /users/{id} users getUserById
+// swagger:route GET /v1/users/{id} users getUserById
 // Get a user by their ID
 // responses:
-//   302: userResponse
+//   200: usersResponse
 //   400: errorResponse
 //   404: errorResponse
 
@@ -65,10 +65,10 @@ func (a *APIServer) HandleGetUserById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user := m.DBUserToUser(dbUser)
-	m.RespondWithJSON(w, user, http.StatusFound)
+	m.RespondWithJSON(w, user, http.StatusOK)
 }
 
-// swagger:route GET /users users getUsers
+// swagger:route GET /v1/users users getUsers
 // Get users with optional filters
 // responses:
 //   200: usersResponse
@@ -122,7 +122,7 @@ func (a *APIServer) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
 	m.RespondWithJSON(w, users, http.StatusOK)
 }
 
-// swagger:route GET /products products getProducts
+// swagger:route GET /v1/products products getProducts
 // Get products with optional filters
 // responses:
 //   200: productsResponse
@@ -194,7 +194,7 @@ func (a *APIServer) HandleGetProducts(w http.ResponseWriter, r *http.Request) {
 	m.RespondWithJSON(w, prds, http.StatusOK)
 }
 
-// swagger:route GET /categories categories getCategories
+// swagger:route GET /v1/categories categories getCategories
 // Get all product categories
 // responses:
 //   200: categoriesResponse
@@ -239,6 +239,28 @@ func (a *APIServer) HandleGetOrderById(w http.ResponseWriter, r *http.Request) {
 	m.RespondWithJSON(w, order, http.StatusOK)
 }
 
+// swagger:route GET /v1/orders orders listOrders
+// Retrieve orders. You can filter by user ID and/or order status. If no parameters are provided, all orders are returned.
+// Responses:
+//
+//	200: ordersResponse
+//	400: errorResponse
+//	500: errorResponse
+//
+// swagger:parameters listOrders
+type listOrdersParams struct {
+	// Filter orders by user ID
+	// in: query
+	// required: false
+	// format: uuid
+	UID string `json:"uid"`
+
+	// Filter orders by status
+	// in: query
+	// required: false
+	Status string `json:"status"`
+}
+
 func (a *APIServer) HandleListOrders(w http.ResponseWriter, r *http.Request) {
 	userIDParam := r.URL.Query().Get("uid")
 	status := r.URL.Query().Get("status")
@@ -267,6 +289,20 @@ func (a *APIServer) HandleListOrders(w http.ResponseWriter, r *http.Request) {
 	m.RespondWithJSON(w, orders, http.StatusOK)
 }
 
+// swagger:route GET /v1/products/popular items getPopularItems
+// Returns a list of the most popular items based on sales or views
+// Responses:
+//
+//	200: popularItemsResponse
+//	500: errorResponse
+//
+// swagger:response popularItemsResponse
+type popularItemsResponseWrapper struct {
+	// List of popular items
+	// in: body
+	Body []m.PopularProduct
+}
+
 func (a *APIServer) HandleGetPopularItems(w http.ResponseWriter, r *http.Request) {
 	query := a.getQueries()
 	dbItems, err := query.GetPopularItems(r.Context())
@@ -277,6 +313,35 @@ func (a *APIServer) HandleGetPopularItems(w http.ResponseWriter, r *http.Request
 
 	items := m.DBPopularProductsToPopularProducts(dbItems)
 	m.RespondWithJSON(w, items, http.StatusOK)
+}
+
+// swagger:route GET /v1/reviews reviews getReviews
+// Retrieve reviews. You can filter by product ID, review ID, or user ID. If no parameters are provided, all reviews are returned.
+// Responses:
+//
+//	200: reviewsResponse
+//	400: errorResponse
+//	500: errorResponse
+//
+// swagger:parameters getReviews
+type getReviewsParams struct {
+	// Filter reviews by product ID
+	// in: query
+	// required: false
+	// format: uuid
+	PID string `json:"pid"`
+
+	// Filter reviews by review ID
+	// in: query
+	// required: false
+	// format: uuid
+	ID string `json:"id"`
+
+	// Filter reviews by user ID
+	// in: query
+	// required: false
+	// format: uuid
+	UID string `json:"uid"`
 }
 
 func (a *APIServer) HandleGetReviews(w http.ResponseWriter, r *http.Request) {

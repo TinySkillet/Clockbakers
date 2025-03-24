@@ -30,10 +30,8 @@ WHERE
   ($4::TEXT = '' OR email = $4)
 ORDER BY first_name;
 
-
 -- name: GetUserByEmail :one
 SELECT * FROM users WHERE email = $1;
-
 
 -- name: GetUserByID :one
 SELECT * FROM users WHERE id=$1;

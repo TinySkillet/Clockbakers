@@ -41,6 +41,9 @@ func (a *APIServer) Run() {
 	getRouter.HandleFunc("/users", m.MiddlewareValidateAdmin(a.HandleGetUsers))
 	getRouter.HandleFunc("/products", a.HandleGetProducts)
 	getRouter.HandleFunc("/categories", a.HandleGetCategories)
+	getRouter.HandleFunc("/orders", m.MiddlewareValidateUser(a.HandleListOrders))
+	getRouter.HandleFunc("/products/popular", a.HandleGetPopularItems)
+	getRouter.HandleFunc("/reviews", m.MiddlewareValidateUser(a.HandleGetReviews))
 
 	// sub router for post methods, post requests are routed to this router
 	postRouter := v1Router.Methods(http.MethodPost).Subrouter()
@@ -48,25 +51,34 @@ func (a *APIServer) Run() {
 	postRouter.HandleFunc("/user", a.HandleCreateUser)
 	postRouter.HandleFunc("/category", m.MiddlewareValidateAdmin(a.HandleCreateCategory))
 	postRouter.HandleFunc("/product", m.MiddlewareValidateAdmin(a.HandleCreateProduct))
+	postRouter.HandleFunc("/cart", m.MiddlewareValidateUser(a.HandleInsertItemInCart))
+	postRouter.HandleFunc("/order", m.MiddlewareValidateUser(a.HandleCreateOrder))
+	postRouter.HandleFunc("/review", m.MiddlewareValidateUser(a.HandleCreateReview))
 
 	// sub router for put methods, put requests are routed to this router
 	putRouter := v1Router.Methods(http.MethodPut).Subrouter()
 	putRouter.HandleFunc("/category", m.MiddlewareValidateAdmin(a.HandleUpdateCategory))
 	putRouter.HandleFunc("/product", m.MiddlewareValidateAdmin(a.HandleUpdateProduct))
 	putRouter.HandleFunc("/user", m.MiddlewareValidateUser(a.HandleUpdateUser))
+	putRouter.HandleFunc("/cart", m.MiddlewareValidateUser(a.HandleReduceItemQtyFromCart))
+	putRouter.HandleFunc("/order", m.MiddlewareValidateAdmin(a.HandleUpdateOrderStatus))
+	putRouter.HandleFunc("/review", m.MiddlewareValidateUser(a.HandleUpdateReview))
 
 	// sub router for delete methods, put requests are routed to this router
 	deleteRouter := v1Router.Methods(http.MethodDelete).Subrouter()
 	deleteRouter.HandleFunc("/category", m.MiddlewareValidateAdmin(a.HandleDeleteCategory))
 	deleteRouter.HandleFunc("/product", m.MiddlewareValidateAdmin(a.HandleDeleteProduct))
+	deleteRouter.HandleFunc("/cart", m.MiddlewareValidateUser(a.HandleDeleteItemFromCart))
+	deleteRouter.HandleFunc("/order", m.MiddlewareValidateUser(a.HandleDeleteOrder))
+	deleteRouter.HandleFunc("/review", m.MiddlewareValidateUser(a.HandleDeleteReview))
 
-	// serve swagger.yaml from the root directory
-	router.HandleFunc("/swagger.yaml", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./swagger.yaml")
+	// serve swagger.json
+	router.HandleFunc("/swagger.json", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./swagger.json")
 	})
 
-	// serve swagger documentation with Redoc
-	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
+	// serve swagger docs with Redoc
+	opts := middleware.RedocOpts{Title: "Clockbakers API Documentation", Template: ""}
 	sh := middleware.Redoc(opts, nil)
 
 	router.Handle("/docs", sh)
