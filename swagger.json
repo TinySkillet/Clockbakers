@@ -8,9 +8,7 @@
     "/v1/cart": {
       "put": {
         "description": "Reduce the quantity of an item in the user's shopping cart",
-        "tags": [
-          "cart"
-        ],
+        "tags": ["cart"],
         "operationId": "reduceItemQtyFromCart",
         "parameters": [
           {
@@ -49,9 +47,7 @@
       },
       "post": {
         "description": "Add an item to the user's shopping cart",
-        "tags": [
-          "cart"
-        ],
+        "tags": ["cart"],
         "operationId": "addItemToCart",
         "parameters": [
           {
@@ -75,9 +71,7 @@
       },
       "delete": {
         "description": "Remove an item from the user's shopping cart",
-        "tags": [
-          "cart"
-        ],
+        "tags": ["cart"],
         "operationId": "deleteItemFromCart",
         "parameters": [
           {
@@ -110,9 +104,7 @@
     "/v1/categories": {
       "get": {
         "description": "Get all product categories",
-        "tags": [
-          "categories"
-        ],
+        "tags": ["categories"],
         "operationId": "getCategories",
         "responses": {
           "200": {
@@ -127,9 +119,7 @@
     "/v1/category": {
       "put": {
         "description": "Update an existing product category",
-        "tags": [
-          "category"
-        ],
+        "tags": ["category"],
         "operationId": "updateCategory",
         "parameters": [
           {
@@ -160,9 +150,7 @@
       },
       "post": {
         "description": "Create a new product category",
-        "tags": [
-          "category"
-        ],
+        "tags": ["category"],
         "operationId": "createCategory",
         "parameters": [
           {
@@ -186,9 +174,7 @@
       },
       "delete": {
         "description": "Delete an existing product category",
-        "tags": [
-          "category"
-        ],
+        "tags": ["category"],
         "operationId": "deleteCategory",
         "parameters": [
           {
@@ -213,9 +199,7 @@
     "/v1/error": {
       "get": {
         "description": "Test error handling",
-        "tags": [
-          "system"
-        ],
+        "tags": ["system"],
         "operationId": "error",
         "responses": {
           "400": {
@@ -227,9 +211,7 @@
     "/v1/healthz": {
       "get": {
         "description": "Check if the API server is running",
-        "tags": [
-          "system"
-        ],
+        "tags": ["system"],
         "operationId": "healthz",
         "responses": {
           "200": {
@@ -241,9 +223,7 @@
     "/v1/login": {
       "post": {
         "description": "Login to the application",
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "operationId": "login",
         "parameters": [
           {
@@ -275,9 +255,7 @@
     "/v1/order": {
       "put": {
         "description": "Update the status of an existing order",
-        "tags": [
-          "order"
-        ],
+        "tags": ["order"],
         "operationId": "updateOrderStatus",
         "parameters": [
           {
@@ -312,9 +290,7 @@
       },
       "post": {
         "description": "Create a new order from cart items",
-        "tags": [
-          "order"
-        ],
+        "tags": ["order"],
         "operationId": "createOrder",
         "parameters": [
           {
@@ -341,9 +317,7 @@
       },
       "delete": {
         "description": "Delete an existing order",
-        "tags": [
-          "order"
-        ],
+        "tags": ["order"],
         "operationId": "deleteOrder",
         "parameters": [
           {
@@ -370,9 +344,7 @@
     },
     "/v1/orders": {
       "get": {
-        "tags": [
-          "orders"
-        ],
+        "tags": ["orders"],
         "summary": "Retrieve orders. You can filter by user ID and/or order status. If no parameters are provided, all orders are returned.",
         "operationId": "listOrders",
         "parameters": [
@@ -407,9 +379,7 @@
     "/v1/product": {
       "put": {
         "description": "Update an existing product",
-        "tags": [
-          "product"
-        ],
+        "tags": ["product"],
         "operationId": "updateProduct",
         "parameters": [
           {
@@ -433,9 +403,7 @@
       },
       "post": {
         "description": "Create a new product",
-        "tags": [
-          "product"
-        ],
+        "tags": ["product"],
         "operationId": "createProduct",
         "parameters": [
           {
@@ -459,9 +427,7 @@
       },
       "delete": {
         "description": "Delete an existing product",
-        "tags": [
-          "product"
-        ],
+        "tags": ["product"],
         "operationId": "deleteProduct",
         "parameters": [
           {
@@ -486,9 +452,7 @@
     "/v1/products": {
       "get": {
         "description": "Get products with optional filters",
-        "tags": [
-          "products"
-        ],
+        "tags": ["products"],
         "operationId": "getProducts",
         "parameters": [
           {
@@ -535,9 +499,7 @@
     "/v1/products/popular": {
       "get": {
         "description": "Returns a list of the most popular items based on sales or views",
-        "tags": [
-          "items"
-        ],
+        "tags": ["items"],
         "operationId": "getPopularItems",
         "responses": {
           "200": {
@@ -552,9 +514,7 @@
     "/v1/review": {
       "put": {
         "description": "Update an existing product review",
-        "tags": [
-          "review"
-        ],
+        "tags": ["review"],
         "operationId": "updateReview",
         "parameters": [
           {
@@ -593,9 +553,7 @@
       },
       "post": {
         "description": "Create a new product review",
-        "tags": [
-          "review"
-        ],
+        "tags": ["review"],
         "operationId": "createReview",
         "parameters": [
           {
@@ -619,9 +577,7 @@
       },
       "delete": {
         "description": "Delete an existing product review",
-        "tags": [
-          "review"
-        ],
+        "tags": ["review"],
         "operationId": "deleteReview",
         "parameters": [
           {
@@ -648,9 +604,7 @@
     },
     "/v1/reviews": {
       "get": {
-        "tags": [
-          "reviews"
-        ],
+        "tags": ["reviews"],
         "summary": "Retrieve reviews. You can filter by product ID, review ID, or user ID. If no parameters are provided, all reviews are returned.",
         "operationId": "getReviews",
         "parameters": [
@@ -692,9 +646,7 @@
     "/v1/user": {
       "put": {
         "description": "Update an existing user's information",
-        "tags": [
-          "users"
-        ],
+        "tags": ["users"],
         "operationId": "updateUser",
         "parameters": [
           {
@@ -726,9 +678,7 @@
       },
       "post": {
         "description": "Create a new user account",
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "operationId": "createUser",
         "parameters": [
           {
@@ -757,9 +707,7 @@
     "/v1/users": {
       "get": {
         "description": "Get users with optional filters",
-        "tags": [
-          "users"
-        ],
+        "tags": ["users"],
         "operationId": "getUsers",
         "parameters": [
           {
@@ -804,9 +752,7 @@
     "/v1/users/{id}": {
       "get": {
         "description": "Get a user by their ID",
-        "tags": [
-          "users"
-        ],
+        "tags": ["users"],
         "operationId": "getUserById",
         "parameters": [
           {

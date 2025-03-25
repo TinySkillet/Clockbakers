@@ -1,0 +1,20 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - CONN_STR=postgres://postgres:log123@postgres:5432/clockbakers?sslmode=disable
+      - SECRET_KEY=manojgandu69420@yahoo.com
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=log123
+      - POSTGRES_DB=clockbakers
+    ports:
+      - "5432:5432"
