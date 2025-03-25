@@ -53,6 +53,12 @@ func (a *APIServer) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err = params.Validate()
+	if err != nil {
+		m.RespondWithError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	queries := a.getQueries()
 	// check if user with given email exists
 	dbUser, err := queries.GetUserByEmail(r.Context(), params.Email)
@@ -121,6 +127,13 @@ func (a *APIServer) HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 		return
 	}
+
+	err = params.Validate()
+	if err != nil {
+		m.RespondWithError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	queries := a.getQueries()
 
 	// hash the password
@@ -197,6 +210,12 @@ func (a *APIServer) HandleCreateCategory(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	err = params.Validate()
+	if err != nil {
+		m.RespondWithError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	queries := a.getQueries()
 	cat, err := queries.CreateCategory(r.Context(), params.CategoryName)
 
@@ -238,6 +257,12 @@ func (a *APIServer) HandleCreateProduct(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		m.RespondWithError(w, "Invalid JSON params!"+err.Error(), http.StatusBadRequest)
 		log.Print(err)
+		return
+	}
+
+	err = params.Validate()
+	if err != nil {
+		m.RespondWithError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -293,6 +318,12 @@ func (a *APIServer) HandleInsertItemInCart(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	err = params.Validate()
+	if err != nil {
+		m.RespondWithError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	queries := a.getQueries()
 
 	err = queries.AddToCart(r.Context(), database.AddToCartParams{
@@ -338,6 +369,12 @@ func (a *APIServer) HandleCreateOrder(w http.ResponseWriter, r *http.Request) {
 	err := m.FromJSON(r, &params)
 	if err != nil {
 		m.RespondWithError(w, "Invalid JSON params!", http.StatusBadRequest)
+		return
+	}
+
+	err = params.Validate()
+	if err != nil {
+		m.RespondWithError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -413,6 +450,12 @@ func (a *APIServer) HandleCreateReview(w http.ResponseWriter, r *http.Request) {
 	err := m.FromJSON(r, &params)
 	if err != nil {
 		m.RespondWithError(w, "Invalid JSON params! "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = params.Validate()
+	if err != nil {
+		m.RespondWithError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 

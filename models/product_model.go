@@ -63,7 +63,7 @@ func DBCartProductsToCartProducts(dbCartProducts []database.GetItemsFromCartRow)
 }
 
 type Category struct {
-	CategoryName string `json:"category_name"`
+	CategoryName string `json:"category_name" validate:"required"`
 }
 
 func DBProductToProduct(dbProd database.Product) Product {

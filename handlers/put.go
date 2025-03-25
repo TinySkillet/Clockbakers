@@ -333,6 +333,12 @@ func (a *APIServer) HandleUpdateReview(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err = params.Validate()
+	if err != nil {
+		m.RespondWithError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	queries := a.getQueries()
 	dbReview, err := queries.UpdateReview(r.Context(), database.UpdateReviewParams{
 		ID:        id,

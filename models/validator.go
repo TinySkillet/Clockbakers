@@ -54,3 +54,8 @@ func (lq *LoginRequest) Validate() error {
 	validate := validator.New()
 	return validate.Struct(lq)
 }
+
+func (c *Category) Validate() error {
+	validate := validator.New()
+	return validate.Struct(c)
+}
