@@ -1,21 +1,9 @@
 {
-  "consumes": [
-    "application/json"
-  ],
-  "produces": [
-    "application/json"
-  ],
-  "schemes": [
-    "http",
-    "https"
-  ],
   "swagger": "2.0",
   "info": {
-    "description": "Documentation for Clockbakers API",
-    "title": "Clockbakers API",
-    "version": "1.0.0"
+    "description": "# Documentation for Clockbakers API\n\nThe Clockbakers API provides a backend service for managing bakery orders, reviews, and user authentication for the Clockbakers bakery.\n\n# Authentication\nThis API uses JWT-based authentication for secure access.\nUsers must include a valid JWT token in the Authorization header.\n\n# Contact Information\n\nContact:\n\u003cmirageaditya@gmail.com\u003e\n\nLicense:\nMIT",
+    "title": "Clockbakers API"
   },
-  "basePath": "/v1/",
   "paths": {
     "/v1/cart": {
       "put": {

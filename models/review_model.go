@@ -15,11 +15,11 @@ type GetReviewsParams struct {
 
 type Review struct {
 	ID        uuid.UUID `json:"id"`
-	Rating    int32     `json:"rating"`
-	Comment   string    `json:"comment"`
+	Rating    int32     `json:"rating" validate:"required,min=1,max=5"`
+	Comment   string    `json:"comment" validate:"required"`
 	CreatedAt time.Time `json:"created_at"`
-	UserID    uuid.UUID `json:"user_id"`
-	ProductID uuid.UUID `json:"product_id"`
+	UserID    uuid.UUID `json:"user_id" validate:"required"`
+	ProductID uuid.UUID `json:"product_id" validate:"required"`
 }
 
 func DBReviewToReview(dbReview database.Review) Review {

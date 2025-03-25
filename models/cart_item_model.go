@@ -7,9 +7,9 @@ import (
 
 type CartItem struct {
 	ID        uuid.UUID `json:"id"`
-	Quantity  int32     `json:"quantity"`
-	UserID    uuid.UUID `json:"user_id"`
-	ProductID uuid.UUID `json:"product_id"`
+	Quantity  int32     `json:"quantity" validate:"required,gt=0"`
+	UserID    uuid.UUID `json:"user_id" validate:"required"`
+	ProductID uuid.UUID `json:"product_id" validate:"required"`
 }
 
 func DBCartItemToCartItem(dbCartItem database.CartItem) CartItem {

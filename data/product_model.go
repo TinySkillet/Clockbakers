@@ -13,8 +13,8 @@ type Product struct {
 	SKU          string    `json:"sku" validate:"required,sku"`
 	Name         string    `json:"name" validate:"required"`
 	Description  string    `json:"description" validate:"required"`
-	Price        float64   `json:"price" validate:"gt=0"`
-	StockQty     int       `json:"stock_qty" validate:"required"`
+	Price        float64   `json:"price" validate:"required,gt=0"`
+	StockQty     int       `json:"stock_qty" validate:"required,gte=0"`
 	CategoryName string    `json:"category" validate:"required"`
 }
 
@@ -23,26 +23,20 @@ type Category struct {
 }
 
 func (p *Product) Validate() error {
-	var Validate = validator.New()
-	Validate.RegisterValidation("sku", validateSKU)
-	return Validate.Struct(p)
+	validate := validator.New()
+	validate.RegisterValidation("sku", validateSKU)
+	return validate.Struct(p)
 }
 
 func (c *Category) Validate() error {
-	var validate = validator.New()
+	validate := validator.New()
 	return validate.Struct(c)
 }
 
+// ensures SKU follows "abc-def-ghi" pattern
 func validateSKU(fl validator.FieldLevel) bool {
-	// sku is of format abc-absd-ablkd
-	re := regexp.MustCompile(`[a-z]+-[a-z]+-[a-z]+`)
-	matches := re.FindAllString(fl.Field().String(), -1)
-
-	// if we don't have exactly one match
-	if len(matches) != 1 {
-		return false
-	}
-	return true
+	re := regexp.MustCompile(`^[a-z]+-[a-z]+-[a-z]+$`)
+	return re.MatchString(fl.Field().String())
 }
 
 func DBProductToProduct(dbProd database.Product) Product {

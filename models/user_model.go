@@ -9,20 +9,20 @@ import (
 
 type User struct {
 	ID        uuid.UUID `json:"id"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-	Email     string    `json:"email"`
-	PhoneNo   string    `json:"phone_no"`
-	Address   string    `json:"address"`
-	Password  string    `json:"password,omitempty"`
-	Role      string    `json:"role"`
+	FirstName string    `json:"first_name" validate:"required"`
+	LastName  string    `json:"last_name" validate:"required"`
+	Email     string    `json:"email" validate:"required,email"`
+	PhoneNo   string    `json:"phone_no" validate:"required,e164"`
+	Address   string    `json:"address" validate:"required"`
+	Password  string    `json:"password,omitempty" validate:"required,min=8"`
+	Role      string    `json:"role" validate:"required,oneof=admin customer"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type LoginRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
 func DBUserToUser(dbUser database.User) User {

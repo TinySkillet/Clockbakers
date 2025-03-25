@@ -9,12 +9,12 @@ import (
 
 type Product struct {
 	ID           uuid.UUID `json:"id"`
-	SKU          string    `json:"sku"`
-	Name         string    `json:"name"`
-	Description  string    `json:"description"`
-	Price        float64   `json:"price"`
-	StockQty     int       `json:"stock_qty"`
-	CategoryName string    `json:"category"`
+	SKU          string    `json:"sku" validate:"required,sku"`
+	Name         string    `json:"name" validate:"required"`
+	Description  string    `json:"description" validate:"required"`
+	Price        float64   `json:"price" validate:"required,gt=0"`
+	StockQty     int       `json:"stock_qty" validate:"required,gte=0"`
+	CategoryName string    `json:"category" validate:"required"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
