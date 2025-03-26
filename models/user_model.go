@@ -12,7 +12,7 @@ type User struct {
 	FirstName string    `json:"first_name" validate:"required"`
 	LastName  string    `json:"last_name" validate:"required"`
 	Email     string    `json:"email" validate:"required,email"`
-	PhoneNo   string    `json:"phone_no" validate:"required,e164"`
+	PhoneNo   string    `json:"phone_no" validate:"required"`
 	Address   string    `json:"address" validate:"required"`
 	Password  string    `json:"password,omitempty" validate:"required,min=8"`
 	Role      string    `json:"role" validate:"required,oneof=admin customer"`
