@@ -5,6 +5,7 @@
 package database
 
 import (
+	"database/sql"
 	"database/sql/driver"
 	"fmt"
 	"time"
@@ -163,6 +164,7 @@ type User struct {
 	Address   string
 	Password  string
 	Role      UserType
+	ImageUrl  sql.NullString
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

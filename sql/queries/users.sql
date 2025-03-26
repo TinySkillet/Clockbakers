@@ -17,8 +17,9 @@ first_name=$1,
 last_name=$2,
 phone_no=$3,
 address=$4,
-updated_at=$5
-WHERE ID=$6
+updated_at=$5,
+image_url=$6
+WHERE ID=$7
 RETURNING *;
 
 -- name: GetUsers :many

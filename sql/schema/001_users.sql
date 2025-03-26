@@ -9,6 +9,7 @@ CREATE TABLE users(
   address TEXT NOT NULL,
   password VARCHAR(64) NOT NULL,
   role user_type NOT NULL,
+  image_url TEXT,
   created_at TIMESTAMP NOT NULL,
   updated_at TIMESTAMP NOT NULL
   );

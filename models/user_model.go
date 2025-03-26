@@ -16,6 +16,7 @@ type User struct {
 	Address   string    `json:"address" validate:"required"`
 	Password  string    `json:"password,omitempty" validate:"required,min=8"`
 	Role      string    `json:"role" validate:"required,oneof=admin customer"`
+	ImageURL  string    `json:"image_url"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -35,6 +36,7 @@ func DBUserToUser(dbUser database.User) User {
 		Address:   dbUser.Address,
 		Password:  "",
 		Role:      string(dbUser.Role),
+		ImageURL:  dbUser.ImageUrl.String,
 		CreatedAt: dbUser.CreatedAt,
 		UpdatedAt: dbUser.UpdatedAt,
 	}

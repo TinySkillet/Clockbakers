@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -23,7 +24,7 @@ $1, $2, $3,
 $4, $5,
 $6, $7, $8,
 $9, $10)
-RETURNING id, first_name, last_name, email, phone_no, address, password, role, created_at, updated_at
+RETURNING id, first_name, last_name, email, phone_no, address, password, role, image_url, created_at, updated_at
 `
 
 type CreateUserParams struct {
@@ -62,6 +63,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Address,
 		&i.Password,
 		&i.Role,
+		&i.ImageUrl,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -69,7 +71,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, first_name, last_name, email, phone_no, address, password, role, created_at, updated_at FROM users WHERE email = $1
+SELECT id, first_name, last_name, email, phone_no, address, password, role, image_url, created_at, updated_at FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -84,6 +86,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Address,
 		&i.Password,
 		&i.Role,
+		&i.ImageUrl,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -91,7 +94,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, first_name, last_name, email, phone_no, address, password, role, created_at, updated_at FROM users WHERE id=$1
+SELECT id, first_name, last_name, email, phone_no, address, password, role, image_url, created_at, updated_at FROM users WHERE id=$1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
@@ -106,6 +109,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.Address,
 		&i.Password,
 		&i.Role,
+		&i.ImageUrl,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -113,7 +117,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 }
 
 const getUsers = `-- name: GetUsers :many
-SELECT id, first_name, last_name, email, phone_no, address, password, role, created_at, updated_at FROM users
+SELECT id, first_name, last_name, email, phone_no, address, password, role, image_url, created_at, updated_at FROM users
 WHERE 
   ($1::TEXT = '' OR first_name ILIKE '%' || $1 || '%') AND
   ($2::TEXT = '' OR last_name ILIKE '%' || $2 || '%') AND
@@ -152,6 +156,7 @@ func (q *Queries) GetUsers(ctx context.Context, arg GetUsersParams) ([]User, err
 			&i.Address,
 			&i.Password,
 			&i.Role,
+			&i.ImageUrl,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -174,9 +179,10 @@ first_name=$1,
 last_name=$2,
 phone_no=$3,
 address=$4,
-updated_at=$5
-WHERE ID=$6
-RETURNING id, first_name, last_name, email, phone_no, address, password, role, created_at, updated_at
+updated_at=$5,
+image_url=$6
+WHERE ID=$7
+RETURNING id, first_name, last_name, email, phone_no, address, password, role, image_url, created_at, updated_at
 `
 
 type UpdateUserParams struct {
@@ -185,6 +191,7 @@ type UpdateUserParams struct {
 	PhoneNo   string
 	Address   string
 	UpdatedAt time.Time
+	ImageUrl  sql.NullString
 	ID        uuid.UUID
 }
 
@@ -195,6 +202,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		arg.PhoneNo,
 		arg.Address,
 		arg.UpdatedAt,
+		arg.ImageUrl,
 		arg.ID,
 	)
 	var i User
@@ -207,6 +215,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Address,
 		&i.Password,
 		&i.Role,
+		&i.ImageUrl,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
