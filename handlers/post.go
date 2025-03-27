@@ -145,7 +145,7 @@ func (a *APIServer) HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	phoneNo := sql.NullString{String: params.PhoneNo, Valid: params.PhoneNo != ""}
-	email := sql.NullString{String: params.Email, Valid: params.Email != ""}
+	address := sql.NullString{String: params.Address, Valid: params.Address != ""}
 
 	// create user in the database
 	u, err := queries.CreateUser(r.Context(), database.CreateUserParams{
@@ -154,7 +154,7 @@ func (a *APIServer) HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 		LastName:  params.LastName,
 		Email:     params.Email,
 		PhoneNo:   phoneNo,
-		Address:   email,
+		Address:   address,
 		Password:  hashed_password,
 		Role:      database.UserTypeCustomer,
 		CreatedAt: time.Now().UTC(),
