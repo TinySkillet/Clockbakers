@@ -9,7 +9,8 @@ func CorsMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
 		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusNoContent)
+			w.Header().Set("Access-Control-Max-Age", "86400")
+			w.WriteHeader(http.StatusOK)
 			return
 		}
 
