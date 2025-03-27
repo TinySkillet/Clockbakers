@@ -12,10 +12,10 @@ type User struct {
 	FirstName string    `json:"first_name" validate:"required"`
 	LastName  string    `json:"last_name" validate:"required"`
 	Email     string    `json:"email" validate:"required,email"`
-	PhoneNo   string    `json:"phone_no" validate:"required"`
-	Address   string    `json:"address" validate:"required"`
+	PhoneNo   string    `json:"phone_no"`
+	Address   string    `json:"address"`
 	Password  string    `json:"password,omitempty" validate:"required,min=8"`
-	Role      string    `json:"role" validate:"required,oneof=admin customer"`
+	Role      string    `json:"role" validate:"required"`
 	ImageURL  string    `json:"image_url"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
