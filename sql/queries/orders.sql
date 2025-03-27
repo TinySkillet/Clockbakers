@@ -1,12 +1,13 @@
 -- name: CreateOrder :one
 INSERT INTO orders (
-  ID, status, total_price,
+  ID, status, total_price, delivery_address,
   created_at, updated_at, user_id
 ) VALUES (
   $1, $2, $3,
   $4,
   $5,
-  $6
+  $6,
+  $7
 ) RETURNING *;
 
 -- name: GetOrder :one

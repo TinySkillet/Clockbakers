@@ -381,7 +381,7 @@ func (a *APIServer) HandleGetReviews(w http.ResponseWriter, r *http.Request) {
 	}
 
 	queries := a.getQueries()
-	reviews, err := queries.GetReviews(r.Context(), database.GetReviewsParams{
+	dbReviews, err := queries.GetReviews(r.Context(), database.GetReviewsParams{
 		Column1: reviewParams.ID.UUID,
 		Column2: reviewParams.ProductID.UUID,
 		Column3: reviewParams.UserId.UUID,
@@ -391,9 +391,46 @@ func (a *APIServer) HandleGetReviews(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var responseReviews []m.Review
-	for _, dbReview := range reviews {
-		responseReviews = append(responseReviews, m.DBReviewToReview(dbReview))
+	reviews := m.DBReviewsToReviews(dbReviews)
+	m.RespondWithJSON(w, reviews, http.StatusOK)
+}
+
+// swagger:route GET /v1/address deliveryAddress getDeliveryAddresses
+// Retrieve delivery addresses for a user.
+//
+// Responses:
+//
+//	200: addressesResponse
+//	400: errorResponse
+//	500: errorResponse
+//
+// swagger:parameters getDeliveryAddresses
+type getDeliveryAddressesParams struct {
+	// User ID (UUID) to fetch delivery addresses for
+	// in: query
+	// required: true
+	// format: uuid
+	UID string `json:"uid"`
+}
+
+func (a *APIServer) HandleGetDeliveryAddresses(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+
+	user_id := query.Get("uid")
+
+	uid, err := uuid.Parse(user_id)
+	if err != nil {
+		m.RespondWithError(w, "Invalid query parameter: uid: "+err.Error(), http.StatusInternalServerError)
+		return
 	}
-	m.RespondWithJSON(w, responseReviews, http.StatusOK)
+
+	queries := a.getQueries()
+	dbAddrs, err := queries.GetDeliveryAddresses(r.Context(), uid)
+	if err != nil {
+		m.RespondWithError(w, "Failed to fetch delivery addresses: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	addrs := m.DBDeliveryAddressesToAddresses(dbAddrs)
+	m.RespondWithJSON(w, addrs, http.StatusOK)
 }

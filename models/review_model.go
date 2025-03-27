@@ -32,3 +32,11 @@ func DBReviewToReview(dbReview database.Review) Review {
 		ProductID: dbReview.ProductID,
 	}
 }
+
+func DBReviewsToReviews(dbReviews []database.Review) []Review {
+	reviews := make([]Review, len(dbReviews))
+	for i, dbReview := range dbReviews {
+		reviews[i] = DBReviewToReview(dbReview)
+	}
+	return reviews
+}

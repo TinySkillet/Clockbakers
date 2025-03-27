@@ -116,13 +116,20 @@ type Category struct {
 	Name string
 }
 
+type DeliveryAddress struct {
+	ID      uuid.UUID
+	Address string
+	UserID  uuid.UUID
+}
+
 type Order struct {
-	ID         uuid.UUID
-	Status     OrderStatus
-	TotalPrice float32
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
-	UserID     uuid.UUID
+	ID              uuid.UUID
+	Status          OrderStatus
+	TotalPrice      float32
+	DeliveryAddress string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	UserID          uuid.UUID
 }
 
 type OrderItem struct {

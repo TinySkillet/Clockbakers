@@ -202,3 +202,57 @@ func (a *APIServer) HandleDeleteReview(w http.ResponseWriter, r *http.Request) {
 
 	m.RespondWithJSON(w, struct{}{}, http.StatusOK)
 }
+
+// swagger:route DELETE /v1/address deliveryAddress deleteDeliveryAddress
+// Delete a delivery address for a user.
+//
+// Responses:
+//
+//	200: emptyResponse
+//	400: errorResponse
+//	500: errorResponse
+//
+// swagger:parameters deleteDeliveryAddress
+type deleteDeliveryAddressParams struct {
+	// Delivery address ID (UUID) to delete
+	// in: query
+	// required: true
+	// format: uuid
+	ID string `json:"id"`
+
+	// User ID (UUID) associated with the address
+	// in: query
+	// required: true
+	// format: uuid
+	UID string `json:"uid"`
+}
+
+func (a *APIServer) HandleDeleteDeliveryAddress(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	address_id := query.Get("id")
+	user_id := query.Get("uid")
+
+	id, err := uuid.Parse(address_id)
+	if err != nil {
+		m.RespondWithError(w, "Invalid delivery address id!", http.StatusBadRequest)
+		return
+	}
+
+	uid, err := uuid.Parse(user_id)
+	if err != nil {
+		m.RespondWithError(w, "Invalid user id!", http.StatusBadRequest)
+		return
+	}
+
+	queries := a.getQueries()
+	err = queries.DeleteDeliveryAddress(r.Context(), database.DeleteDeliveryAddressParams{
+		ID:     id,
+		UserID: uid,
+	})
+
+	if err != nil {
+		m.RespondWithError(w, "Failed to delete delivery address!", http.StatusInternalServerError)
+		return
+	}
+	m.RespondWithJSON(w, struct{}{}, http.StatusOK)
+}

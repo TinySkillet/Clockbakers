@@ -8,13 +8,14 @@ import (
 )
 
 type Order struct {
-	ID         uuid.UUID   `json:"id"`
-	Status     string      `json:"status" validate:"required,oneof=pending processing shipped delivered cancelled"`
-	TotalPrice float32     `json:"total_price" validate:"required,gt=0"`
-	Items      []OrderItem `json:"items" validate:"required,dive"`
-	CreatedAt  time.Time   `json:"created_at"`
-	UpdatedAt  time.Time   `json:"updated_at"`
-	UserID     uuid.UUID   `json:"user_id" validate:"required"`
+	ID              uuid.UUID   `json:"id"`
+	Status          string      `json:"status" validate:"required,oneof=pending processing shipped delivered cancelled"`
+	DeliveryAddress string      `json:"delivery_address" validate:"required"`
+	TotalPrice      float32     `json:"total_price" validate:"required,gt=0"`
+	Items           []OrderItem `json:"items" validate:"required,dive"`
+	CreatedAt       time.Time   `json:"created_at"`
+	UpdatedAt       time.Time   `json:"updated_at"`
+	UserID          uuid.UUID   `json:"user_id" validate:"required"`
 }
 
 func DBOrderToOrder(dbOrder database.Order) Order {

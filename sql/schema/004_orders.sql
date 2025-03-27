@@ -6,6 +6,7 @@ CREATE TABLE orders (
   ID UUID PRIMARY KEY NOT NULL,
   status order_status NOT NULL,
   total_price float(10) NOT NULL,
+  delivery_address TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL,
   updated_at TIMESTAMP NOT NULL,
   user_id UUID NOT NULL REFERENCES users(ID)

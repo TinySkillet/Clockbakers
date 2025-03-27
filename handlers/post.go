@@ -384,12 +384,13 @@ func (a *APIServer) HandleCreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	queries := a.getQueries()
 	dbOrder, err := queries.CreateOrder(r.Context(), database.CreateOrderParams{
-		ID:         uuid.New(),
-		Status:     database.OrderStatusPending,
-		TotalPrice: params.TotalPrice,
-		CreatedAt:  time.Now().UTC(),
-		UpdatedAt:  time.Now().UTC(),
-		UserID:     params.UserID,
+		ID:              uuid.New(),
+		Status:          database.OrderStatusPending,
+		TotalPrice:      params.TotalPrice,
+		DeliveryAddress: params.DeliveryAddress,
+		CreatedAt:       time.Now().UTC(),
+		UpdatedAt:       time.Now().UTC(),
+		UserID:          params.UserID,
 	})
 	if err != nil {
 		m.RespondWithError(w, "Failed to create order: "+err.Error(), http.StatusInternalServerError)
@@ -479,4 +480,60 @@ func (a *APIServer) HandleCreateReview(w http.ResponseWriter, r *http.Request) {
 	}
 	review := m.DBReviewToReview(dbReview)
 	m.RespondWithJSON(w, review, http.StatusCreated)
+}
+
+// swagger:route POST /v1/address deliveryAddress createDeliveryAddress
+// Create a new delivery address for a user.
+//
+// Responses:
+//
+//	201: addressResponse
+//	400: errorResponse
+//	500: errorResponse
+//
+// swagger:parameters createDeliveryAddress
+type createDeliveryAddressParams struct {
+	// Delivery address details
+	// in: body
+	// required: true
+	Body struct {
+		// The address details
+		// example: "123 Main Street, City, Country"
+		Address string `json:"address"`
+
+		// User ID (UUID) to associate with the address
+		// format: uuid
+		UserID uuid.UUID `json:"user_id"`
+	}
+}
+
+func (a *APIServer) HandleCreateDeliveryAddress(w http.ResponseWriter, r *http.Request) {
+	params := m.DeliveryAddress{}
+
+	err := m.FromJSON(r, &params)
+	if err != nil {
+		m.RespondWithError(w, "Invalid JSON params! "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = params.Validate()
+	if err != nil {
+		m.RespondWithError(w, "Validation error: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	queries := a.getQueries()
+	dbAddress, err := queries.CreateDeliveryAddress(r.Context(), database.CreateDeliveryAddressParams{
+		ID:      uuid.New(),
+		Address: params.Address,
+		UserID:  params.UserID,
+	})
+
+	if err != nil {
+		m.RespondWithError(w, "Failed to create address: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	address := m.DBDeliveryAddressToAddress(dbAddress)
+	m.RespondWithJSON(w, address, http.StatusCreated)
 }

@@ -59,3 +59,8 @@ func (c *Category) Validate() error {
 	validate := validator.New()
 	return validate.Struct(c)
 }
+
+func (d *DeliveryAddress) Validate() error {
+	validate := validator.New()
+	return validate.Struct(d)
+}
