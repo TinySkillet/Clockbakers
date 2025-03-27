@@ -169,9 +169,14 @@ type Order struct {
 	ID           uuid.UUID
 	Status       OrderStatus
 	TotalPrice   float32
+	Quantity     int32
+	Pounds       float32
+	Message      string
 	DeliveryTime DeliveryTimes
+	DeliveryDate string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+	ProductID    uuid.UUID
 	UserID       uuid.UUID
 }
 

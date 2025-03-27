@@ -14,24 +14,30 @@ import (
 
 const createOrder = `-- name: CreateOrder :one
 INSERT INTO orders (
-  ID, status, total_price, delivery_time,
-  created_at, updated_at, user_id
+  ID, status, total_price, quantity,
+  pounds, message,
+  delivery_time, delivery_date, created_at, updated_at,
+  product_id, user_id
 ) VALUES (
-  $1, $2, $3,
-  $4,
-  $5,
-  $6,
-  $7
-) RETURNING id, status, total_price, delivery_time, created_at, updated_at, user_id
+  $1, $2, $3, $4,
+  $5, $6,
+  $7, $8, $9, $10,
+  $11, $12
+) RETURNING id, status, total_price, quantity, pounds, message, delivery_time, delivery_date, created_at, updated_at, product_id, user_id
 `
 
 type CreateOrderParams struct {
 	ID           uuid.UUID
 	Status       OrderStatus
 	TotalPrice   float32
+	Quantity     int32
+	Pounds       float32
+	Message      string
 	DeliveryTime DeliveryTimes
+	DeliveryDate string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+	ProductID    uuid.UUID
 	UserID       uuid.UUID
 }
 
@@ -40,9 +46,14 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 		arg.ID,
 		arg.Status,
 		arg.TotalPrice,
+		arg.Quantity,
+		arg.Pounds,
+		arg.Message,
 		arg.DeliveryTime,
+		arg.DeliveryDate,
 		arg.CreatedAt,
 		arg.UpdatedAt,
+		arg.ProductID,
 		arg.UserID,
 	)
 	var i Order
@@ -50,46 +61,88 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 		&i.ID,
 		&i.Status,
 		&i.TotalPrice,
+		&i.Quantity,
+		&i.Pounds,
+		&i.Message,
 		&i.DeliveryTime,
+		&i.DeliveryDate,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ProductID,
 		&i.UserID,
 	)
 	return i, err
 }
 
 const deleteOrder = `-- name: DeleteOrder :exec
-DELETE FROM orders WHERE ID = $1
+DELETE FROM orders WHERE ID = $1 AND user_id = $2
 `
 
-func (q *Queries) DeleteOrder(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.ExecContext(ctx, deleteOrder, id)
+type DeleteOrderParams struct {
+	ID     uuid.UUID
+	UserID uuid.UUID
+}
+
+func (q *Queries) DeleteOrder(ctx context.Context, arg DeleteOrderParams) error {
+	_, err := q.db.ExecContext(ctx, deleteOrder, arg.ID, arg.UserID)
 	return err
 }
 
 const getOrder = `-- name: GetOrder :one
-SELECT id, status, total_price, delivery_time, created_at, updated_at, user_id FROM orders WHERE ID = $1
+SELECT o.id, o.status, o.total_price, o.quantity, o.pounds, o.message, o.delivery_time, o.delivery_date, o.created_at, o.updated_at, o.product_id, o.user_id, p.SKU, p.name, p.description, p.category 
+FROM orders o
+INNER JOIN products p ON
+o.product_id = p.ID
+WHERE o.ID = $1
 `
 
-func (q *Queries) GetOrder(ctx context.Context, id uuid.UUID) (Order, error) {
+type GetOrderRow struct {
+	ID           uuid.UUID
+	Status       OrderStatus
+	TotalPrice   float32
+	Quantity     int32
+	Pounds       float32
+	Message      string
+	DeliveryTime DeliveryTimes
+	DeliveryDate string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	ProductID    uuid.UUID
+	UserID       uuid.UUID
+	Sku          string
+	Name         string
+	Description  string
+	Category     string
+}
+
+func (q *Queries) GetOrder(ctx context.Context, id uuid.UUID) (GetOrderRow, error) {
 	row := q.db.QueryRowContext(ctx, getOrder, id)
-	var i Order
+	var i GetOrderRow
 	err := row.Scan(
 		&i.ID,
 		&i.Status,
 		&i.TotalPrice,
+		&i.Quantity,
+		&i.Pounds,
+		&i.Message,
 		&i.DeliveryTime,
+		&i.DeliveryDate,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ProductID,
 		&i.UserID,
+		&i.Sku,
+		&i.Name,
+		&i.Description,
+		&i.Category,
 	)
 	return i, err
 }
 
 const getPopularItems = `-- name: GetPopularItems :many
-SELECT p.id, p.sku, p.name, p.description, p.price, p.stock_qty, p.category, p.created_at, p.updated_at, COUNT(oi.product_id) AS order_count
+SELECT p.id, p.sku, p.name, p.description, p.price, p.stock_qty, p.category, p.created_at, p.updated_at, COUNT(o.product_id) AS order_count
 FROM products p
-JOIN order_items oi ON p.ID = oi.product_id
+JOIN orders o ON o.product_id = p.ID
 GROUP BY p.ID
 ORDER BY order_count DESC
 `
@@ -142,11 +195,12 @@ func (q *Queries) GetPopularItems(ctx context.Context) ([]GetPopularItemsRow, er
 }
 
 const listOrders = `-- name: ListOrders :many
-SELECT id, status, total_price, delivery_time, created_at, updated_at, user_id FROM orders 
+SELECT o.id, o.status, o.total_price, o.quantity, o.pounds, o.message, o.delivery_time, o.delivery_date, o.created_at, o.updated_at, o.product_id, o.user_id, p.SKU, p.name, p.description, p.category FROM orders o
+INNER JOIN products p ON o.product_id = p.ID
 WHERE 
   ($1 IS NULL OR user_id = $1) AND 
   ($2 = '' OR status = $2)
-ORDER BY created_at DESC
+ORDER BY o.created_at DESC
 `
 
 type ListOrdersParams struct {
@@ -154,23 +208,51 @@ type ListOrdersParams struct {
 	Column2 interface{}
 }
 
-func (q *Queries) ListOrders(ctx context.Context, arg ListOrdersParams) ([]Order, error) {
+type ListOrdersRow struct {
+	ID           uuid.UUID
+	Status       OrderStatus
+	TotalPrice   float32
+	Quantity     int32
+	Pounds       float32
+	Message      string
+	DeliveryTime DeliveryTimes
+	DeliveryDate string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	ProductID    uuid.UUID
+	UserID       uuid.UUID
+	Sku          string
+	Name         string
+	Description  string
+	Category     string
+}
+
+func (q *Queries) ListOrders(ctx context.Context, arg ListOrdersParams) ([]ListOrdersRow, error) {
 	rows, err := q.db.QueryContext(ctx, listOrders, arg.Column1, arg.Column2)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Order
+	var items []ListOrdersRow
 	for rows.Next() {
-		var i Order
+		var i ListOrdersRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Status,
 			&i.TotalPrice,
+			&i.Quantity,
+			&i.Pounds,
+			&i.Message,
 			&i.DeliveryTime,
+			&i.DeliveryDate,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.ProductID,
 			&i.UserID,
+			&i.Sku,
+			&i.Name,
+			&i.Description,
+			&i.Category,
 		); err != nil {
 			return nil, err
 		}
@@ -189,7 +271,7 @@ const updateOrderStatus = `-- name: UpdateOrderStatus :one
 UPDATE orders SET 
   status = $2, updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
 WHERE ID = $1
-RETURNING id, status, total_price, delivery_time, created_at, updated_at, user_id
+RETURNING id, status, total_price, quantity, pounds, message, delivery_time, delivery_date, created_at, updated_at, product_id, user_id
 `
 
 type UpdateOrderStatusParams struct {
@@ -204,9 +286,14 @@ func (q *Queries) UpdateOrderStatus(ctx context.Context, arg UpdateOrderStatusPa
 		&i.ID,
 		&i.Status,
 		&i.TotalPrice,
+		&i.Quantity,
+		&i.Pounds,
+		&i.Message,
 		&i.DeliveryTime,
+		&i.DeliveryDate,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.ProductID,
 		&i.UserID,
 	)
 	return i, err

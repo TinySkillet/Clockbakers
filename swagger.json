@@ -420,14 +420,13 @@
         }
       },
       "post": {
-        "description": "Create a new order from cart items",
+        "description": "Create a new order",
         "tags": [
           "order"
         ],
         "operationId": "createOrder",
         "parameters": [
           {
-            "description": "Order information including items",
             "name": "Body",
             "in": "body",
             "required": true,
@@ -460,6 +459,14 @@
             "x-go-name": "ID",
             "description": "The ID of the order to delete",
             "name": "id",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "UserID",
+            "description": "The UserID of the user who made the order",
+            "name": "uid",
             "in": "query",
             "required": true
           }
@@ -1005,6 +1012,10 @@
           "format": "date-time",
           "x-go-name": "CreatedAt"
         },
+        "delivery_date": {
+          "type": "string",
+          "x-go-name": "DeliveryDate"
+        },
         "delivery_time": {
           "type": "string",
           "x-go-name": "DeliveryTime"
@@ -1014,12 +1025,24 @@
           "format": "uuid",
           "x-go-name": "ID"
         },
-        "items": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/OrderItem"
-          },
-          "x-go-name": "Items"
+        "message": {
+          "type": "string",
+          "x-go-name": "Message"
+        },
+        "pounds": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Pounds"
+        },
+        "product_id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "ProductID"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "Quantity"
         },
         "status": {
           "type": "string",
@@ -1039,46 +1062,6 @@
           "type": "string",
           "format": "uuid",
           "x-go-name": "UserID"
-        }
-      },
-      "x-go-package": "github.com/TinySkillet/ClockBakers/models"
-    },
-    "OrderItem": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid",
-          "x-go-name": "ID"
-        },
-        "message": {
-          "type": "string",
-          "x-go-name": "Message"
-        },
-        "order_id": {
-          "type": "string",
-          "format": "uuid",
-          "x-go-name": "OrderID"
-        },
-        "pid": {
-          "type": "string",
-          "format": "uuid",
-          "x-go-name": "ProductID"
-        },
-        "pounds": {
-          "type": "number",
-          "format": "double",
-          "x-go-name": "Pounds"
-        },
-        "price_at_purchase": {
-          "type": "number",
-          "format": "double",
-          "x-go-name": "PriceAtPurchase"
-        },
-        "quantity": {
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "Quantity"
         }
       },
       "x-go-package": "github.com/TinySkillet/ClockBakers/models"

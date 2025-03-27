@@ -346,15 +346,14 @@ func (a *APIServer) HandleInsertItemInCart(w http.ResponseWriter, r *http.Reques
 }
 
 // swagger:route POST /v1/order order createOrder
-// Create a new order from cart items
+// Create a new order
 // responses:
 //   201: orderResponse
 //   400: errorResponse
 //   500: errorResponse
 
 // swagger:parameters createOrder
-type createOrderParams struct {
-	// Order information including items
+type createOrderParamsWrapper struct {
 	// in: body
 	// required: true
 	Body m.Order
@@ -362,7 +361,6 @@ type createOrderParams struct {
 
 // swagger:response orderResponse
 type orderResponseWrapper struct {
-	// The created order
 	// in: body
 	Body m.Order
 }
@@ -387,35 +385,23 @@ func (a *APIServer) HandleCreateOrder(w http.ResponseWriter, r *http.Request) {
 		ID:           uuid.New(),
 		Status:       database.OrderStatusPending,
 		TotalPrice:   params.TotalPrice,
+		Quantity:     int32(params.Quantity),
+		Pounds:       float32(params.Pounds),
+		Message:      params.Message,
 		DeliveryTime: database.DeliveryTimes(params.DeliveryTime),
+		DeliveryDate: params.DeliveryDate,
 		CreatedAt:    time.Now().UTC(),
 		UpdatedAt:    time.Now().UTC(),
+		ProductID:    params.ProductID,
 		UserID:       params.UserID,
 	})
+
 	if err != nil {
 		m.RespondWithError(w, "Failed to create order: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	var createdItems []m.OrderItem
-	// insert order items
-	for _, item := range params.Items {
-		dbOrderItem, err := queries.CreateOrderItem(r.Context(), database.CreateOrderItemParams{
-			ID:              uuid.New(),
-			Quantity:        int32(item.Quantity),
-			PriceAtPurchase: float32(item.PriceAtPurchase),
-			OrderID:         dbOrder.ID,
-			ProductID:       item.ProductID,
-		})
-		if err != nil {
-			m.RespondWithError(w, "Failed to insert order item: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-		createdItems = append(createdItems, m.DBOrderItemToOrderItem(dbOrderItem))
-	}
-
 	order := m.DBOrderToOrder(dbOrder)
-	order.Items = createdItems
 	m.RespondWithJSON(w, order, http.StatusCreated)
 }
 

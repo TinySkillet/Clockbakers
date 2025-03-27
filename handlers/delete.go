@@ -134,21 +134,37 @@ type deleteOrderParams struct {
 	// in: query
 	// required: true
 	ID string `json:"id"`
+
+	// The UserID of the user who made the order
+	// in: query
+	// required: true
+	UserID string `json:"uid"`
 }
 
-// HandleDeleteOrder deletes an order by ID
+// HandleDeleteOrder deletes an order by ID and UserID
 func (a *APIServer) HandleDeleteOrder(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 
 	orderID := query.Get("id")
+	userID := query.Get("uid")
 	id, err := uuid.Parse(orderID)
 	if err != nil {
-		m.RespondWithError(w, "Invalid order ID", http.StatusBadRequest)
+		m.RespondWithError(w, "Invalid order ID (id)", http.StatusBadRequest)
+		return
+	}
+
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		m.RespondWithError(w, "Invalid uid", http.StatusBadRequest)
 		return
 	}
 
 	queries := a.getQueries()
-	err = queries.DeleteOrder(r.Context(), id)
+	err = queries.DeleteOrder(r.Context(), database.DeleteOrderParams{
+		ID:     id,
+		UserID: uid,
+	})
+
 	if err != nil {
 		m.RespondWithError(w, "Failed to delete order!", http.StatusInternalServerError)
 		return
