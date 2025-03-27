@@ -806,6 +806,34 @@
       }
     },
     "/v1/user": {
+      "get": {
+        "description": "Get a user by their ID",
+        "tags": [
+          "user"
+        ],
+        "operationId": "getUserById",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "User ID",
+            "name": "id",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/usersResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "404": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
       "put": {
         "description": "Update an existing user's information",
         "tags": [
@@ -916,36 +944,6 @@
           }
         }
       }
-    },
-    "/v1/users/{id}": {
-      "get": {
-        "description": "Get a user by their ID",
-        "tags": [
-          "users"
-        ],
-        "operationId": "getUserById",
-        "parameters": [
-          {
-            "type": "string",
-            "x-go-name": "ID",
-            "description": "User ID",
-            "name": "id",
-            "in": "query",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "$ref": "#/responses/usersResponse"
-          },
-          "400": {
-            "$ref": "#/responses/errorResponse"
-          },
-          "404": {
-            "$ref": "#/responses/errorResponse"
-          }
-        }
-      }
     }
   },
   "definitions": {
@@ -1007,9 +1005,9 @@
           "format": "date-time",
           "x-go-name": "CreatedAt"
         },
-        "delivery_address": {
+        "delivery_time": {
           "type": "string",
-          "x-go-name": "DeliveryAddress"
+          "x-go-name": "DeliveryTime"
         },
         "id": {
           "type": "string",
@@ -1053,6 +1051,10 @@
           "format": "uuid",
           "x-go-name": "ID"
         },
+        "message": {
+          "type": "string",
+          "x-go-name": "Message"
+        },
         "order_id": {
           "type": "string",
           "format": "uuid",
@@ -1062,6 +1064,11 @@
           "type": "string",
           "format": "uuid",
           "x-go-name": "ProductID"
+        },
+        "pounds": {
+          "type": "number",
+          "format": "double",
+          "x-go-name": "Pounds"
         },
         "price_at_purchase": {
           "type": "number",
