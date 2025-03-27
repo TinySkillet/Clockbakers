@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -444,4 +445,116 @@ func (a *APIServer) HandleGetDeliveryAddresses(w http.ResponseWriter, r *http.Re
 
 	addrs := m.DBDeliveryAddressesToAddresses(dbAddrs)
 	m.RespondWithJSON(w, addrs, http.StatusOK)
+}
+
+// swagger:route GET /v1/cart_id cart getCartID
+// Retrieve the cart ID for a specific user.
+// Responses:
+//
+//	200: cartIDResponse
+//	400: errorResponse
+//	500: errorResponse
+//
+// swagger:parameters getCartID
+type getCartIDParams struct {
+	// Filter cart ID by user ID
+	// in: query
+	// required: true
+	// format: uuid
+	UID string `json:"uid"`
+}
+
+func (a *APIServer) HandleGetCartID(w http.ResponseWriter, r *http.Request) {
+	user_id := r.URL.Query().Get("uid")
+	if user_id == "" {
+		m.RespondWithError(w, "User ID is required", http.StatusBadRequest)
+		return
+	}
+
+	uid, err := uuid.Parse(user_id)
+	if err != nil {
+		m.RespondWithError(w, "Invalid user ID format", http.StatusBadRequest)
+		return
+	}
+
+	queries := a.getQueries()
+
+	cart_id, err := queries.GetCartID(r.Context(), uid)
+	if err != nil {
+		log.Printf("Error retrieving cart items: %v", err)
+		m.RespondWithError(w, "Failed to retrieve cart id", http.StatusInternalServerError)
+		return
+	}
+
+	m.RespondWithJSON(w, struct {
+		CartID uuid.UUID `json:"cart_id"`
+	}{
+		CartID: cart_id,
+	}, http.StatusOK)
+}
+
+// swagger:route GET /v1/cart cart getCartItems
+// Retrieve items in a user's cart. A user ID is required to fetch cart contents.
+// Responses:
+//
+//	200: cartItemsResponse
+//	400: errorResponse
+//	500: errorResponse
+//
+// swagger:parameters getCartItems
+type getCartItemsParams struct {
+	// Filter cart items by user ID
+	// in: query
+	// required: true
+	// format: uuid
+	UID string `json:"uid"`
+}
+
+func (a *APIServer) HandleGetCartItems(w http.ResponseWriter, r *http.Request) {
+	// Extract user ID from the request
+	userIDParam := r.URL.Query().Get("uid")
+	if userIDParam == "" {
+		m.RespondWithError(w, "User ID is required", http.StatusBadRequest)
+		return
+	}
+
+	// Parse the user ID
+	userID, err := uuid.Parse(userIDParam)
+	if err != nil {
+		m.RespondWithError(w, "Invalid user ID format", http.StatusBadRequest)
+		return
+	}
+
+	queries := a.getQueries()
+
+	// Retrieve cart items
+	cartItems, err := queries.GetItemsFromCart(r.Context(), userID)
+	if err != nil {
+
+		log.Printf("Error retrieving cart items: %v", err)
+		m.RespondWithError(w, "Failed to retrieve cart items", http.StatusInternalServerError)
+		return
+	}
+
+	// Handle empty cart scenario
+	if len(cartItems) == 0 {
+		m.RespondWithJSON(w, []any{}, http.StatusOK)
+		return
+	}
+
+	var responseItems []m.CartItemResponse
+	for _, item := range cartItems {
+		responseItems = append(responseItems, m.CartItemResponse{
+			SKU:         item.Sku,
+			Name:        item.Name,
+			Description: item.Description,
+			Price:       float64(item.Price),
+			StockQty:    item.StockQty,
+			Category:    item.Category,
+			Quantity:    item.Quantity,
+		})
+	}
+
+	// Respond with cart items
+	m.RespondWithJSON(w, responseItems, http.StatusOK)
 }

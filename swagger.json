@@ -115,6 +115,34 @@
       }
     },
     "/v1/cart": {
+      "get": {
+        "tags": [
+          "cart"
+        ],
+        "summary": "Retrieve items in a user's cart. A user ID is required to fetch cart contents.",
+        "operationId": "getCartItems",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "UID",
+            "description": "Filter cart items by user ID",
+            "name": "uid",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/cartItemsResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
       "put": {
         "description": "Reduce the quantity of an item in the user's shopping cart",
         "tags": [
@@ -211,6 +239,36 @@
             "$ref": "#/responses/emptyResponse"
           },
           "400": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
+    "/v1/cart_id": {
+      "get": {
+        "tags": [
+          "cart"
+        ],
+        "summary": "Retrieve the cart ID for a specific user.",
+        "operationId": "getCartID",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "UID",
+            "description": "Filter cart ID by user ID",
+            "name": "uid",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/cartIDResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "500": {
             "$ref": "#/responses/errorResponse"
           }
         }

@@ -61,6 +61,8 @@ func (a *APIServer) Run() {
 	getRouter.HandleFunc("/products/popular", a.HandleGetPopularItems)
 	getRouter.HandleFunc("/reviews", m.MiddlewareValidateUser(a.HandleGetReviews))
 	getRouter.HandleFunc("/address", m.MiddlewareValidateUser(a.HandleGetDeliveryAddresses))
+	getRouter.Handle("/cart", m.MiddlewareValidateUser(a.HandleGetCartItems))
+	getRouter.Handle("/cart_id", m.MiddlewareValidateUser(a.HandleGetCartID))
 
 	// sub router for post methods, post requests are routed to this router
 	postRouter := v1Router.Methods(http.MethodPost).Subrouter()

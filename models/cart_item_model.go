@@ -12,6 +12,16 @@ type CartItem struct {
 	ProductID uuid.UUID `json:"product_id" validate:"required"`
 }
 
+type CartItemResponse struct {
+	SKU         string  `json:"sku"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Price       float64 `json:"price"`
+	StockQty    int32   `json:"stock_quantity"`
+	Category    string  `json:"category"`
+	Quantity    int32   `json:"cart_quantity"`
+}
+
 func DBCartItemToCartItem(dbCartItem database.CartItem) CartItem {
 	return CartItem{
 		ID:        dbCartItem.ID,
