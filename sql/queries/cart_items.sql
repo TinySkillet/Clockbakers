@@ -23,8 +23,7 @@ AND cart_id = $2;
 
 -- name: GetItemsFromCart :many
 SELECT p.SKU, p.name, p.description, p.price,
-       p.stock_qty, p.category, c.quantity 
-FROM cart_items c 
-INNER JOIN products p ON c.product_id = p.ID
-INNER JOIN carts crt ON crt.ID = c.cart_id 
-WHERE crt.user_id = $1;
+       p.stock_qty, p.category, c.quantity
+FROM products p
+INNER JOIN cart_items c ON  p.ID = c.product_id
+WHERE c.cart_id = $1;

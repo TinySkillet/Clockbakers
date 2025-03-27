@@ -288,7 +288,7 @@ func (a *APIServer) HandleListOrders(w http.ResponseWriter, r *http.Request) {
 
 	queries := a.getQueries()
 	dbOrders, err := queries.ListOrders(r.Context(), database.ListOrdersParams{
-		Column1: uid.UUID,
+		Column1: uid,
 		Column2: status,
 	})
 
@@ -504,36 +504,34 @@ func (a *APIServer) HandleGetCartID(w http.ResponseWriter, r *http.Request) {
 //
 // swagger:parameters getCartItems
 type getCartItemsParams struct {
-	// Filter cart items by user ID
+	// Filter cart items by cart_id
 	// in: query
 	// required: true
 	// format: uuid
-	UID string `json:"uid"`
+	CartId string `json:"cart_id"`
 }
 
 func (a *APIServer) HandleGetCartItems(w http.ResponseWriter, r *http.Request) {
-	// Extract user ID from the request
-	userIDParam := r.URL.Query().Get("uid")
-	if userIDParam == "" {
-		m.RespondWithError(w, "User ID is required", http.StatusBadRequest)
+	cartIDParam := r.URL.Query().Get("cart_id")
+	if cartIDParam == "" {
+		m.RespondWithError(w, "Cart ID is required", http.StatusBadRequest)
 		return
 	}
 
-	// Parse the user ID
-	userID, err := uuid.Parse(userIDParam)
+	cartID, err := uuid.Parse(cartIDParam)
 	if err != nil {
-		m.RespondWithError(w, "Invalid user ID format", http.StatusBadRequest)
+		m.RespondWithError(w, "Invalid cart ID format", http.StatusBadRequest)
 		return
 	}
 
 	queries := a.getQueries()
 
 	// Retrieve cart items
-	cartItems, err := queries.GetItemsFromCart(r.Context(), userID)
+	cartItems, err := queries.GetItemsFromCart(r.Context(), cartID)
 	if err != nil {
 
 		log.Printf("Error retrieving cart items: %v", err)
-		m.RespondWithError(w, "Failed to retrieve cart items", http.StatusInternalServerError)
+		m.RespondWithError(w, "Failed to retrieve cart items"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 

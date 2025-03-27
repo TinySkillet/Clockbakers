@@ -204,7 +204,7 @@ ORDER BY o.created_at DESC
 `
 
 type ListOrdersParams struct {
-	Column1 uuid.UUID
+	Column1 uuid.NullUUID
 	Column2 string
 }
 

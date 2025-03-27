@@ -6,7 +6,7 @@ CREATE TYPE delivery_times AS ENUM ('morning', 'afternoon', 'evening');
 
 CREATE TABLE orders (
   ID UUID PRIMARY KEY NOT NULL,
-  status order_status NOT NULL,
+  status order_status NOT NULL DEFAULT 'pending',
   total_price float(10) NOT NULL,
   quantity INTEGER NOT NULL,
   pounds FLOAT(10) NOT NULL,
