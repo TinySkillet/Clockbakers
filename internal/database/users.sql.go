@@ -32,8 +32,8 @@ type CreateUserParams struct {
 	FirstName string
 	LastName  string
 	Email     string
-	PhoneNo   string
-	Address   string
+	PhoneNo   sql.NullString
+	Address   sql.NullString
 	Password  string
 	Role      UserType
 	CreatedAt time.Time
@@ -188,8 +188,8 @@ RETURNING id, first_name, last_name, email, phone_no, address, password, role, i
 type UpdateUserParams struct {
 	FirstName string
 	LastName  string
-	PhoneNo   string
-	Address   string
+	PhoneNo   sql.NullString
+	Address   sql.NullString
 	UpdatedAt time.Time
 	ImageUrl  sql.NullString
 	ID        uuid.UUID

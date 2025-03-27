@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"time"
@@ -143,14 +144,17 @@ func (a *APIServer) HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	phoneNo := sql.NullString{String: params.PhoneNo, Valid: params.PhoneNo != ""}
+	email := sql.NullString{String: params.Email, Valid: params.Email != ""}
+
 	// create user in the database
 	u, err := queries.CreateUser(r.Context(), database.CreateUserParams{
 		ID:        uuid.New(),
 		FirstName: params.FirstName,
 		LastName:  params.LastName,
 		Email:     params.Email,
-		PhoneNo:   params.PhoneNo,
-		Address:   params.Address,
+		PhoneNo:   phoneNo,
+		Address:   email,
 		Password:  hashed_password,
 		Role:      database.UserTypeCustomer,
 		CreatedAt: time.Now().UTC(),

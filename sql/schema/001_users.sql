@@ -5,14 +5,26 @@ CREATE TABLE users(
   first_name VARCHAR(64) NOT NULL,
   last_name VARCHAR(64) NOT NULL,
   email VARCHAR(64) NOT NULL UNIQUE,
-  phone_no VARCHAR(64) NOT NULL,
-  address TEXT NOT NULL,
+  phone_no VARCHAR(64),
+  address TEXT,
   password VARCHAR(64) NOT NULL,
   role user_type NOT NULL,
   image_url TEXT,
   created_at TIMESTAMP NOT NULL,
   updated_at TIMESTAMP NOT NULL
   );
+
+INSERT INTO users (
+    ID, first_name, last_name,
+    email, phone_no,
+    address, password, role,
+    created_at, updated_at
+) VALUES (
+    '92413b7e-0568-46e2-a1a5-8f180e3c521b', 'Subarna', 'Bajracharya',
+    'subarna@example.com', '+1234567890',
+    '123 Main St, City, Country', '3e94d2611ea3c3b08bb705820850fc9a4725fba58553101cdf256f0b4a660c2d', 'admin',
+    CURRENT_TIMESTAMP AT TIME ZONE 'UTC', CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+);
   
 -- +goose Down
 DROP TABLE users;

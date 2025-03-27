@@ -47,12 +47,15 @@ func (a *APIServer) HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	params := m.User{}
 	m.FromJSON(r, params)
 
+	phoneNo := sql.NullString{String: params.PhoneNo, Valid: params.PhoneNo != ""}
+	email := sql.NullString{String: params.Email, Valid: params.Email != ""}
+
 	queries := a.getQueries()
 	dbUpdatedUser, err := queries.UpdateUser(r.Context(), database.UpdateUserParams{
 		FirstName: params.FirstName,
 		LastName:  params.LastName,
-		PhoneNo:   params.PhoneNo,
-		Address:   params.Address,
+		PhoneNo:   phoneNo,
+		Address:   email,
 		ID:        uid,
 	})
 

@@ -160,8 +160,8 @@ type User struct {
 	FirstName string
 	LastName  string
 	Email     string
-	PhoneNo   string
-	Address   string
+	PhoneNo   sql.NullString
+	Address   sql.NullString
 	Password  string
 	Role      UserType
 	ImageUrl  sql.NullString
