@@ -34,7 +34,7 @@ func (a *APIServer) HandleError(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(struct{}{})
 }
 
-// swagger:route GET /v1/users/{id} users getUserById
+// swagger:route GET /v1/user user getUserById
 // Get a user by their ID
 // responses:
 //   200: usersResponse
@@ -296,7 +296,7 @@ func (a *APIServer) HandleListOrders(w http.ResponseWriter, r *http.Request) {
 	var orders []m.Order
 	// fetch order items for each order
 	for _, dbOrder := range dbOrders {
-		dbOrderItems, err := queries.GetOrderItems(r.Context(), dbOrder.ID)
+		dbOrderItems, err := queries.GetOrderItemsByOrderID(r.Context(), dbOrder.ID)
 		if err != nil {
 			m.RespondWithError(w, "Failed to fetch order items", http.StatusInternalServerError)
 			return

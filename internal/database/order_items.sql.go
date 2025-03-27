@@ -48,13 +48,13 @@ func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams
 	return i, err
 }
 
-const getOrderItems = `-- name: GetOrderItems :many
+const getOrderItemsByOrderID = `-- name: GetOrderItemsByOrderID :many
 SELECT id, quantity, price_at_purchase, order_id, product_id FROM order_items 
 WHERE order_id = $1
 `
 
-func (q *Queries) GetOrderItems(ctx context.Context, orderID uuid.UUID) ([]OrderItem, error) {
-	rows, err := q.db.QueryContext(ctx, getOrderItems, orderID)
+func (q *Queries) GetOrderItemsByOrderID(ctx context.Context, orderID uuid.UUID) ([]OrderItem, error) {
+	rows, err := q.db.QueryContext(ctx, getOrderItemsByOrderID, orderID)
 	if err != nil {
 		return nil, err
 	}

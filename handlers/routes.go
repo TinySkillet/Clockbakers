@@ -54,6 +54,7 @@ func (a *APIServer) Run() {
 	getRouter.HandleFunc("/healthz", a.HandleHealthz)
 	getRouter.HandleFunc("/error", a.HandleError)
 	getRouter.HandleFunc("/users", m.MiddlewareValidateAdmin(a.HandleGetUsers))
+	getRouter.HandleFunc("/user", m.MiddlewareValidateUser(a.HandleGetUserById))
 	getRouter.HandleFunc("/products", a.HandleGetProducts)
 	getRouter.HandleFunc("/categories", a.HandleGetCategories)
 	getRouter.HandleFunc("/orders", m.MiddlewareValidateUser(a.HandleListOrders))

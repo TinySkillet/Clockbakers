@@ -537,3 +537,59 @@ func (a *APIServer) HandleCreateDeliveryAddress(w http.ResponseWriter, r *http.R
 	address := m.DBDeliveryAddressToAddress(dbAddress)
 	m.RespondWithJSON(w, address, http.StatusCreated)
 }
+
+func (a *APIServer) HandleResetPassword(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+
+	email := query.Get("email")
+	if email == "" {
+		m.RespondWithError(w, "Invalid query parameter: email", http.StatusBadRequest)
+		return
+	}
+
+	queries := a.getQueries()
+	users, err := queries.GetUsers(r.Context(), database.GetUsersParams{
+		Column4: email,
+	})
+	if err != nil {
+		m.RespondWithError(w, "Couldn't find account with that email!", http.StatusBadRequest)
+		return
+	}
+
+	if len(users) == 0 {
+		m.RespondWithError(w, "Couldn't find account with that email!", http.StatusBadRequest)
+		return
+	}
+
+	// user := users[0]
+
+	resetCode, err := m.GenerateResetCode()
+	if err != nil {
+		m.RespondWithError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	expiresAt := time.Now().Add(3 * time.Hour).UTC()
+	_, err = queries.CreatePasswordResetCode(r.Context(), database.CreatePasswordResetCodeParams{
+		ID:        uuid.New(),
+		Email:     email,
+		Code:      resetCode,
+		ExpiresAt: expiresAt,
+		CreatedAt: time.Now().UTC(),
+	})
+
+	if err != nil {
+		m.RespondWithError(w, "Failed to create reset code", http.StatusInternalServerError)
+		return
+	}
+
+	// subject := "Your Password Reset Code"
+	// body := fmt.Sprintf("Hello %s,\n\nYour password reset code is: %s\n\nThis code will expire in 3 hours.\n", user.Username, resetCode)
+
+	// // Setup SMTP configuration (replace with your configuration)
+	// from := "no-reply@yourdomain.com"
+	// password := "your-smtp-password"
+	// smtpHost := "smtp.yourdomain.com"
+	// smtpPort := "587"
+
+}

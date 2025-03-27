@@ -140,6 +140,14 @@ type OrderItem struct {
 	ProductID       uuid.UUID
 }
 
+type PasswordResetCode struct {
+	ID        uuid.UUID
+	Email     string
+	Code      string
+	ExpiresAt time.Time
+	CreatedAt time.Time
+}
+
 type Product struct {
 	ID          uuid.UUID
 	Sku         string
