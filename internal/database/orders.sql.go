@@ -198,14 +198,14 @@ const listOrders = `-- name: ListOrders :many
 SELECT o.id, o.status, o.total_price, o.quantity, o.pounds, o.message, o.delivery_time, o.delivery_date, o.created_at, o.updated_at, o.product_id, o.user_id, p.SKU, p.name, p.description, p.category FROM orders o
 INNER JOIN products p ON o.product_id = p.ID
 WHERE 
-  ($1 IS NULL OR user_id = $1) AND 
-  ($2 = '' OR status = $2)
+  ($1::UUID IS NULL OR user_id = $1) AND 
+  ($2::TEXT = '' OR status = $2)
 ORDER BY o.created_at DESC
 `
 
 type ListOrdersParams struct {
-	Column1 interface{}
-	Column2 interface{}
+	Column1 uuid.UUID
+	Column2 string
 }
 
 type ListOrdersRow struct {

@@ -272,27 +272,27 @@ type ordersResponseWrapper struct {
 }
 
 func (a *APIServer) HandleListOrders(w http.ResponseWriter, r *http.Request) {
-	userIDParam := r.URL.Query().Get("uid")
+	user_id := r.URL.Query().Get("uid")
 	status := r.URL.Query().Get("status")
 
-	var userID *uuid.UUID
-	if userIDParam != "" {
-		parsedID, err := uuid.Parse(userIDParam)
+	var uid uuid.NullUUID
+	if user_id != "" {
+		parsedID, err := uuid.Parse(user_id)
 		if err != nil {
 			m.RespondWithError(w, "Invalid user ID", http.StatusBadRequest)
 			return
 		}
-		userID = &parsedID
+		uid = uuid.NullUUID{UUID: parsedID, Valid: true}
 	}
 
 	queries := a.getQueries()
 	dbOrders, err := queries.ListOrders(r.Context(), database.ListOrdersParams{
-		Column1: userID,
+		Column1: uid.UUID,
 		Column2: status,
 	})
 
 	if err != nil {
-		m.RespondWithError(w, "Failed to retrieve orders", http.StatusInternalServerError)
+		m.RespondWithError(w, "Failed to retrieve orders"+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
