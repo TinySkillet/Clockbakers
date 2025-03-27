@@ -22,3 +22,11 @@ func DBOrderItemToOrderItem(dbOrderItem database.OrderItem) OrderItem {
 		ProductID:       dbOrderItem.ProductID,
 	}
 }
+
+func DBOrderItemsToOrderItems(dbOrderItems []database.OrderItem) []OrderItem {
+	orderItems := make([]OrderItem, len(dbOrderItems))
+	for i, dbOrderItem := range dbOrderItems {
+		orderItems[i] = DBOrderItemToOrderItem(dbOrderItem)
+	}
+	return orderItems
+}

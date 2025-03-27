@@ -488,14 +488,21 @@
           {
             "type": "string",
             "x-go-name": "UID",
-            "description": "Filter orders by user ID",
+            "description": "User ID to filter orders",
             "name": "uid",
             "in": "query"
           },
           {
+            "enum": [
+              "pending",
+              "processing",
+              "shipped",
+              "delivered",
+              "cancelled"
+            ],
             "type": "string",
             "x-go-name": "Status",
-            "description": "Filter orders by status",
+            "description": "Order status to filter orders",
             "name": "status",
             "in": "query"
           }
@@ -1310,6 +1317,15 @@
       "description": "",
       "schema": {
         "$ref": "#/definitions/Order"
+      }
+    },
+    "ordersResponse": {
+      "description": "",
+      "schema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Order"
+        }
       }
     },
     "popularItemsResponse": {

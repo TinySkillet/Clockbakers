@@ -241,6 +241,7 @@ func (a *APIServer) HandleGetOrderById(w http.ResponseWriter, r *http.Request) {
 
 // swagger:route GET /v1/orders orders listOrders
 // Retrieve orders. You can filter by user ID and/or order status. If no parameters are provided, all orders are returned.
+//
 // Responses:
 //
 //	200: ordersResponse
@@ -249,16 +250,23 @@ func (a *APIServer) HandleGetOrderById(w http.ResponseWriter, r *http.Request) {
 //
 // swagger:parameters listOrders
 type listOrdersParams struct {
-	// Filter orders by user ID
+	// User ID to filter orders
 	// in: query
 	// required: false
 	// format: uuid
 	UID string `json:"uid"`
 
-	// Filter orders by status
+	// Order status to filter orders
 	// in: query
 	// required: false
+	// enum: ["pending", "processing", "shipped", "delivered", "cancelled"]
 	Status string `json:"status"`
+}
+
+// swagger:response ordersResponse
+type ordersResponse struct {
+	// in: body
+	Body []m.Order
 }
 
 func (a *APIServer) HandleListOrders(w http.ResponseWriter, r *http.Request) {
@@ -284,8 +292,21 @@ func (a *APIServer) HandleListOrders(w http.ResponseWriter, r *http.Request) {
 		m.RespondWithError(w, "Failed to retrieve orders", http.StatusInternalServerError)
 		return
 	}
+	// orders := m.DBOrdersToOrders(dbOrders)
+	var orders []m.Order
+	// fetch order items for each order
+	for _, dbOrder := range dbOrders {
+		dbOrderItems, err := queries.GetOrderItems(r.Context(), dbOrder.ID)
+		if err != nil {
+			m.RespondWithError(w, "Failed to fetch order items", http.StatusInternalServerError)
+			return
+		}
+		order := m.DBOrderToOrder(dbOrder)
+		order.Items = m.DBOrderItemsToOrderItems(dbOrderItems)
 
-	orders := m.DBOrdersToOrders(dbOrders)
+		orders = append(orders, order)
+	}
+
 	m.RespondWithJSON(w, orders, http.StatusOK)
 }
 

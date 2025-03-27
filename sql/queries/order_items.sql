@@ -7,6 +7,6 @@ VALUES(
   $4, $5)
 RETURNING *;
 
--- name: GetOrderItems :many
+-- name: GetOrderItemsByOrderID :many
 SELECT * FROM order_items 
 WHERE order_id = $1;
