@@ -30,7 +30,7 @@ func (a *APIServer) Run() {
 	router := mux.NewRouter()
 
 	corsMiddleware := handlers.CORS(
-		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowedOrigins([]string{"http://localhost:5173"}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
 		handlers.AllowedHeaders([]string{
 			"Content-Type",
@@ -39,6 +39,7 @@ func (a *APIServer) Run() {
 			"X-CSRF-Token",
 		}),
 		handlers.MaxAge(3600),
+		handlers.AllowCredentials(),
 	)
 
 	// cors middleware

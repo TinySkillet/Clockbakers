@@ -106,7 +106,7 @@ func CreateToken(id uuid.UUID, email, role string) (string, error) {
 			IssuedAt: &jwt.NumericDate{
 				Time: time.Now().UTC(),
 			},
-			Issuer: "localhost:6000",
+			Issuer: "localhost:8080",
 		},
 	}
 	jwt_token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
