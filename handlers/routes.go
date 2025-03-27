@@ -32,7 +32,13 @@ func (a *APIServer) Run() {
 	corsMiddleware := handlers.CORS(
 		handlers.AllowedOrigins([]string{"*"}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
-		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
+		handlers.AllowedHeaders([]string{
+			"Content-Type",
+			"Authorization",
+			"X-Requested-With",
+			"X-CSRF-Token",
+		}),
+		handlers.MaxAge(3600),
 	)
 
 	// cors middleware
