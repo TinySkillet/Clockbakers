@@ -5,10 +5,121 @@
     "title": "Clockbakers API"
   },
   "paths": {
+    "/v1/address": {
+      "get": {
+        "tags": [
+          "deliveryAddress"
+        ],
+        "summary": "Retrieve delivery addresses for a user.",
+        "operationId": "getDeliveryAddresses",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "UID",
+            "description": "User ID (UUID) to fetch delivery addresses for",
+            "name": "uid",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/addressesResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "deliveryAddress"
+        ],
+        "summary": "Create a new delivery address for a user.",
+        "operationId": "createDeliveryAddress",
+        "parameters": [
+          {
+            "description": "Delivery address details",
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "address": {
+                  "description": "The address details",
+                  "type": "string",
+                  "x-go-name": "Address",
+                  "example": "\"123 Main Street, City, Country\""
+                },
+                "user_id": {
+                  "description": "User ID (UUID) to associate with the address\nformat: uuid",
+                  "type": "string",
+                  "format": "uuid",
+                  "x-go-name": "UserID"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/addressResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "deliveryAddress"
+        ],
+        "summary": "Delete a delivery address for a user.",
+        "operationId": "deleteDeliveryAddress",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "ID",
+            "description": "Delivery address ID (UUID) to delete",
+            "name": "id",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "x-go-name": "UID",
+            "description": "User ID (UUID) associated with the address",
+            "name": "uid",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "400": {
+            "$ref": "#/responses/errorResponse"
+          },
+          "500": {
+            "$ref": "#/responses/errorResponse"
+          }
+        }
+      }
+    },
     "/v1/cart": {
       "put": {
         "description": "Reduce the quantity of an item in the user's shopping cart",
-        "tags": ["cart"],
+        "tags": [
+          "cart"
+        ],
         "operationId": "reduceItemQtyFromCart",
         "parameters": [
           {
@@ -47,7 +158,9 @@
       },
       "post": {
         "description": "Add an item to the user's shopping cart",
-        "tags": ["cart"],
+        "tags": [
+          "cart"
+        ],
         "operationId": "addItemToCart",
         "parameters": [
           {
@@ -71,7 +184,9 @@
       },
       "delete": {
         "description": "Remove an item from the user's shopping cart",
-        "tags": ["cart"],
+        "tags": [
+          "cart"
+        ],
         "operationId": "deleteItemFromCart",
         "parameters": [
           {
@@ -104,7 +219,9 @@
     "/v1/categories": {
       "get": {
         "description": "Get all product categories",
-        "tags": ["categories"],
+        "tags": [
+          "categories"
+        ],
         "operationId": "getCategories",
         "responses": {
           "200": {
@@ -119,7 +236,9 @@
     "/v1/category": {
       "put": {
         "description": "Update an existing product category",
-        "tags": ["category"],
+        "tags": [
+          "category"
+        ],
         "operationId": "updateCategory",
         "parameters": [
           {
@@ -150,7 +269,9 @@
       },
       "post": {
         "description": "Create a new product category",
-        "tags": ["category"],
+        "tags": [
+          "category"
+        ],
         "operationId": "createCategory",
         "parameters": [
           {
@@ -174,7 +295,9 @@
       },
       "delete": {
         "description": "Delete an existing product category",
-        "tags": ["category"],
+        "tags": [
+          "category"
+        ],
         "operationId": "deleteCategory",
         "parameters": [
           {
@@ -199,7 +322,9 @@
     "/v1/error": {
       "get": {
         "description": "Test error handling",
-        "tags": ["system"],
+        "tags": [
+          "system"
+        ],
         "operationId": "error",
         "responses": {
           "400": {
@@ -211,7 +336,9 @@
     "/v1/healthz": {
       "get": {
         "description": "Check if the API server is running",
-        "tags": ["system"],
+        "tags": [
+          "system"
+        ],
         "operationId": "healthz",
         "responses": {
           "200": {
@@ -223,7 +350,9 @@
     "/v1/login": {
       "post": {
         "description": "Login to the application",
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "operationId": "login",
         "parameters": [
           {
@@ -255,7 +384,9 @@
     "/v1/order": {
       "put": {
         "description": "Update the status of an existing order",
-        "tags": ["order"],
+        "tags": [
+          "order"
+        ],
         "operationId": "updateOrderStatus",
         "parameters": [
           {
@@ -290,7 +421,9 @@
       },
       "post": {
         "description": "Create a new order from cart items",
-        "tags": ["order"],
+        "tags": [
+          "order"
+        ],
         "operationId": "createOrder",
         "parameters": [
           {
@@ -317,7 +450,9 @@
       },
       "delete": {
         "description": "Delete an existing order",
-        "tags": ["order"],
+        "tags": [
+          "order"
+        ],
         "operationId": "deleteOrder",
         "parameters": [
           {
@@ -344,7 +479,9 @@
     },
     "/v1/orders": {
       "get": {
-        "tags": ["orders"],
+        "tags": [
+          "orders"
+        ],
         "summary": "Retrieve orders. You can filter by user ID and/or order status. If no parameters are provided, all orders are returned.",
         "operationId": "listOrders",
         "parameters": [
@@ -379,7 +516,9 @@
     "/v1/product": {
       "put": {
         "description": "Update an existing product",
-        "tags": ["product"],
+        "tags": [
+          "product"
+        ],
         "operationId": "updateProduct",
         "parameters": [
           {
@@ -403,7 +542,9 @@
       },
       "post": {
         "description": "Create a new product",
-        "tags": ["product"],
+        "tags": [
+          "product"
+        ],
         "operationId": "createProduct",
         "parameters": [
           {
@@ -427,7 +568,9 @@
       },
       "delete": {
         "description": "Delete an existing product",
-        "tags": ["product"],
+        "tags": [
+          "product"
+        ],
         "operationId": "deleteProduct",
         "parameters": [
           {
@@ -452,7 +595,9 @@
     "/v1/products": {
       "get": {
         "description": "Get products with optional filters",
-        "tags": ["products"],
+        "tags": [
+          "products"
+        ],
         "operationId": "getProducts",
         "parameters": [
           {
@@ -499,7 +644,9 @@
     "/v1/products/popular": {
       "get": {
         "description": "Returns a list of the most popular items based on sales or views",
-        "tags": ["items"],
+        "tags": [
+          "items"
+        ],
         "operationId": "getPopularItems",
         "responses": {
           "200": {
@@ -514,7 +661,9 @@
     "/v1/review": {
       "put": {
         "description": "Update an existing product review",
-        "tags": ["review"],
+        "tags": [
+          "review"
+        ],
         "operationId": "updateReview",
         "parameters": [
           {
@@ -553,7 +702,9 @@
       },
       "post": {
         "description": "Create a new product review",
-        "tags": ["review"],
+        "tags": [
+          "review"
+        ],
         "operationId": "createReview",
         "parameters": [
           {
@@ -577,7 +728,9 @@
       },
       "delete": {
         "description": "Delete an existing product review",
-        "tags": ["review"],
+        "tags": [
+          "review"
+        ],
         "operationId": "deleteReview",
         "parameters": [
           {
@@ -604,7 +757,9 @@
     },
     "/v1/reviews": {
       "get": {
-        "tags": ["reviews"],
+        "tags": [
+          "reviews"
+        ],
         "summary": "Retrieve reviews. You can filter by product ID, review ID, or user ID. If no parameters are provided, all reviews are returned.",
         "operationId": "getReviews",
         "parameters": [
@@ -646,7 +801,9 @@
     "/v1/user": {
       "put": {
         "description": "Update an existing user's information",
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "operationId": "updateUser",
         "parameters": [
           {
@@ -678,7 +835,9 @@
       },
       "post": {
         "description": "Create a new user account",
-        "tags": ["user"],
+        "tags": [
+          "user"
+        ],
         "operationId": "createUser",
         "parameters": [
           {
@@ -707,7 +866,9 @@
     "/v1/users": {
       "get": {
         "description": "Get users with optional filters",
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "operationId": "getUsers",
         "parameters": [
           {
@@ -752,7 +913,9 @@
     "/v1/users/{id}": {
       "get": {
         "description": "Get a user by their ID",
-        "tags": ["users"],
+        "tags": [
+          "users"
+        ],
         "operationId": "getUserById",
         "parameters": [
           {
@@ -832,13 +995,14 @@
     "Order": {
       "type": "object",
       "properties": {
-        "Status": {
-          "type": "string"
-        },
         "created_at": {
           "type": "string",
           "format": "date-time",
           "x-go-name": "CreatedAt"
+        },
+        "delivery_address": {
+          "type": "string",
+          "x-go-name": "DeliveryAddress"
         },
         "id": {
           "type": "string",
@@ -851,6 +1015,10 @@
             "$ref": "#/definitions/OrderItem"
           },
           "x-go-name": "Items"
+        },
+        "status": {
+          "type": "string",
+          "x-go-name": "Status"
         },
         "total_price": {
           "type": "number",
@@ -1059,6 +1227,10 @@
           "type": "string",
           "format": "uuid",
           "x-go-name": "ID"
+        },
+        "image_url": {
+          "type": "string",
+          "x-go-name": "ImageURL"
         },
         "last_name": {
           "type": "string",
