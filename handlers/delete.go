@@ -84,10 +84,10 @@ type deleteItemFromCartParams struct {
 	// in: query
 	// required: true
 	ProductID string `json:"pid"`
-	// The user ID associated with the cart
+	// The cart ID associated with the cart
 	// in: query
 	// required: true
-	UserID string `json:"uid"`
+	CartID string `json:"cart_id"`
 }
 
 // HandleDeleteItemFromCart removes a product from the user's shopping cart
@@ -95,7 +95,7 @@ func (a *APIServer) HandleDeleteItemFromCart(w http.ResponseWriter, r *http.Requ
 	query := r.URL.Query()
 
 	product_id := query.Get("pid")
-	user_id := query.Get("uid")
+	cart_id := query.Get("cart_id")
 
 	pid, err := uuid.Parse(product_id)
 	if err != nil {
@@ -103,7 +103,7 @@ func (a *APIServer) HandleDeleteItemFromCart(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	uid, err := uuid.Parse(user_id)
+	cid, err := uuid.Parse(cart_id)
 	if err != nil {
 		m.RespondWithError(w, "Invalid query parameter: uid!", http.StatusBadRequest)
 		return
@@ -112,7 +112,7 @@ func (a *APIServer) HandleDeleteItemFromCart(w http.ResponseWriter, r *http.Requ
 	queries := a.getQueries()
 	err = queries.RemoveFromCart(r.Context(), database.RemoveFromCartParams{
 		ProductID: pid,
-		UserID:    uid,
+		CartID:    cid,
 	})
 	if err != nil {
 		m.RespondWithError(w, err.Error(), http.StatusBadRequest)

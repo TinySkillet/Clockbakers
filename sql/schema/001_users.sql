@@ -14,6 +14,7 @@ CREATE TABLE users(
   updated_at TIMESTAMP NOT NULL
   );
 
+
 INSERT INTO users (
     ID, first_name, last_name,
     email, phone_no,

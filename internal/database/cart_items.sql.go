@@ -17,14 +17,14 @@ INSERT INTO cart_items (
   cart_id, product_id
 ) VALUES (
   $1, $2,
-  (SELECT ID FROM carts WHERE user_id = $3 LIMIT 1), $4
+  $3, $4
 )
 `
 
 type AddToCartParams struct {
 	ID        uuid.UUID
 	Quantity  int32
-	UserID    uuid.UUID
+	CartID    uuid.UUID
 	ProductID uuid.UUID
 }
 
@@ -32,7 +32,7 @@ func (q *Queries) AddToCart(ctx context.Context, arg AddToCartParams) error {
 	_, err := q.db.ExecContext(ctx, addToCart,
 		arg.ID,
 		arg.Quantity,
-		arg.UserID,
+		arg.CartID,
 		arg.ProductID,
 	)
 	return err
@@ -92,33 +92,33 @@ const reduceQuantityFromCart = `-- name: ReduceQuantityFromCart :exec
 UPDATE cart_items
 SET quantity = quantity - $1
 WHERE product_id = $2 
-AND cart_id IN (SELECT cart_id FROM carts WHERE user_id = $3)
+AND cart_id = $3
 AND quantity > $1
 `
 
 type ReduceQuantityFromCartParams struct {
 	Quantity  int32
 	ProductID uuid.UUID
-	UserID    uuid.UUID
+	CartID    uuid.UUID
 }
 
 func (q *Queries) ReduceQuantityFromCart(ctx context.Context, arg ReduceQuantityFromCartParams) error {
-	_, err := q.db.ExecContext(ctx, reduceQuantityFromCart, arg.Quantity, arg.ProductID, arg.UserID)
+	_, err := q.db.ExecContext(ctx, reduceQuantityFromCart, arg.Quantity, arg.ProductID, arg.CartID)
 	return err
 }
 
 const removeFromCart = `-- name: RemoveFromCart :exec
 DELETE FROM cart_items 
 WHERE product_id = $1 
-AND cart_id IN (SELECT ID FROM carts WHERE user_id = $2)
+AND cart_id = $2
 `
 
 type RemoveFromCartParams struct {
 	ProductID uuid.UUID
-	UserID    uuid.UUID
+	CartID    uuid.UUID
 }
 
 func (q *Queries) RemoveFromCart(ctx context.Context, arg RemoveFromCartParams) error {
-	_, err := q.db.ExecContext(ctx, removeFromCart, arg.ProductID, arg.UserID)
+	_, err := q.db.ExecContext(ctx, removeFromCart, arg.ProductID, arg.CartID)
 	return err
 }

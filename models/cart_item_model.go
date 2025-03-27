@@ -8,7 +8,7 @@ import (
 type CartItem struct {
 	ID        uuid.UUID `json:"id"`
 	Quantity  int32     `json:"quantity" validate:"required,gt=0"`
-	UserID    uuid.UUID `json:"user_id" validate:"required"`
+	CartID    uuid.UUID `json:"cart_id" validate:"required"`
 	ProductID uuid.UUID `json:"product_id" validate:"required"`
 }
 
@@ -26,7 +26,7 @@ func DBCartItemToCartItem(dbCartItem database.CartItem) CartItem {
 	return CartItem{
 		ID:        dbCartItem.ID,
 		Quantity:  dbCartItem.Quantity,
-		UserID:    dbCartItem.CartID,
+		CartID:    dbCartItem.CartID,
 		ProductID: dbCartItem.ProductID,
 	}
 }

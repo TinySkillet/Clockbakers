@@ -333,7 +333,7 @@ func (a *APIServer) HandleInsertItemInCart(w http.ResponseWriter, r *http.Reques
 	err = queries.AddToCart(r.Context(), database.AddToCartParams{
 		ID:        params.ID,
 		Quantity:  params.Quantity,
-		UserID:    params.UserID,
+		CartID:    params.CartID,
 		ProductID: params.ProductID,
 	})
 

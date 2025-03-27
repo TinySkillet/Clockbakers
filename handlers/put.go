@@ -201,7 +201,7 @@ func (a *APIServer) HandleReduceItemQtyFromCart(w http.ResponseWriter, r *http.R
 
 	quantity := query.Get("qty")
 	product_id := query.Get("pid")
-	user_id := query.Get("uid")
+	cart_id := query.Get("cid")
 
 	qty, err := strconv.Atoi(quantity)
 	if err != nil {
@@ -215,7 +215,7 @@ func (a *APIServer) HandleReduceItemQtyFromCart(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	uid, err := uuid.Parse(user_id)
+	cid, err := uuid.Parse(cart_id)
 	if err != nil {
 		m.RespondWithError(w, "Invalid query parameter: cart_id!", http.StatusBadRequest)
 		return
@@ -225,7 +225,7 @@ func (a *APIServer) HandleReduceItemQtyFromCart(w http.ResponseWriter, r *http.R
 	err = queries.ReduceQuantityFromCart(r.Context(), database.ReduceQuantityFromCartParams{
 		Quantity:  int32(qty),
 		ProductID: pid,
-		UserID:    uid,
+		CartID:    cid,
 	})
 
 	if err != nil {

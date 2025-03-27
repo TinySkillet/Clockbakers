@@ -494,7 +494,8 @@ func (a *APIServer) HandleGetCartID(w http.ResponseWriter, r *http.Request) {
 }
 
 // swagger:route GET /v1/cart cart getCartItems
-// Retrieve items in a user's cart. A user ID is required to fetch cart contents.
+// Retrieve items in a user's cart.
+// Description: A user ID is required to fetch cart contents.
 // Responses:
 //
 //	200: cartItemsResponse

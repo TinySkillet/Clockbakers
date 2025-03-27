@@ -116,10 +116,11 @@
     },
     "/v1/cart": {
       "get": {
+        "description": "Description: A user ID is required to fetch cart contents.",
         "tags": [
           "cart"
         ],
-        "summary": "Retrieve items in a user's cart. A user ID is required to fetch cart contents.",
+        "summary": "Retrieve items in a user's cart.",
         "operationId": "getCartItems",
         "parameters": [
           {
@@ -227,9 +228,9 @@
           },
           {
             "type": "string",
-            "x-go-name": "UserID",
-            "description": "The user ID associated with the cart",
-            "name": "uid",
+            "x-go-name": "CartID",
+            "description": "The cart ID associated with the cart",
+            "name": "cart_id",
             "in": "query",
             "required": true
           }
@@ -1015,6 +1016,11 @@
     "CartItem": {
       "type": "object",
       "properties": {
+        "cart_id": {
+          "type": "string",
+          "format": "uuid",
+          "x-go-name": "CartID"
+        },
         "id": {
           "type": "string",
           "format": "uuid",
@@ -1029,11 +1035,6 @@
           "type": "integer",
           "format": "int32",
           "x-go-name": "Quantity"
-        },
-        "user_id": {
-          "type": "string",
-          "format": "uuid",
-          "x-go-name": "UserID"
         }
       },
       "x-go-package": "github.com/TinySkillet/ClockBakers/models"

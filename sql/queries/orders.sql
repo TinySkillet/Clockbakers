@@ -29,8 +29,8 @@ ORDER BY order_count DESC;
 SELECT o.*, p.SKU, p.name, p.description, p.category FROM orders o
 INNER JOIN products p ON o.product_id = p.ID
 WHERE 
-  ($1::UUID IS NULL OR user_id = $1) AND 
-  ($2::TEXT = '' OR status = $2)
+  ($1::UUID IS NULL OR o.user_id = $1) AND 
+  ($2::TEXT = '' OR o.status = $2)
 ORDER BY o.created_at DESC;
 
 -- name: UpdateOrderStatus :one
