@@ -49,7 +49,7 @@ type getUserByIdParams struct {
 	ID string `json:"id"`
 }
 
-// HandleGetUserById retrieves a user by their UUID
+// HandleGetUserById retrieves a user by their UUID (uid)
 func (a *APIServer) HandleGetUserById(w http.ResponseWriter, r *http.Request) {
 	queries := a.getQueries()
 	query := r.URL.Query()
