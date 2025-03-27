@@ -20,9 +20,10 @@ INSERT INTO users (
     address, password, role,
     created_at, updated_at
 ) VALUES (
-    '92413b7e-0568-46e2-a1a5-8f180e3c521b', 'Subarna', 'Bajracharya',
+    'f47ac10b-58cc-4372-a567-0e02b2c3d479', 'Subarna', 'Bajracharya',
     'subarna@example.com', '+1234567890',
-    '123 Main St, City, Country', '3e94d2611ea3c3b08bb705820850fc9a4725fba58553101cdf256f0b4a660c2d', 'admin',
+    '123 Main St, City, Country',
+    '3e94d2611ea3c3b08bb705820850fc9a4725fba58553101cdf256f0b4a660c2d', 'admin',
     CURRENT_TIMESTAMP AT TIME ZONE 'UTC', CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
 );
   

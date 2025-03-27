@@ -152,7 +152,6 @@ type UpdateProductParams struct {
 	UpdatedAt   time.Time       `json:"updated_at"`
 }
 
-
 func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error) {
 	row := q.db.QueryRowContext(ctx, updateProduct,
 		arg.Sku,
