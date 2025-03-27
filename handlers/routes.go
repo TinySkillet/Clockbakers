@@ -28,11 +28,12 @@ func (a *APIServer) Run() {
 	// base router
 	router := mux.NewRouter()
 
-	// v1 router, we can improve to other versions in the future
-	v1Router := router.PathPrefix("/v1").Subrouter()
-
 	// cors middleware
 	router.Use(m.CorsMiddleware)
+
+	// v1 router, we can improve to other versions in the future
+	v1Router := router.PathPrefix("/v1").Subrouter()
+	v1Router.Use(m.CorsMiddleware)
 
 	// sub router for get methods, get requests are routed to this router
 	getRouter := v1Router.Methods(http.MethodGet).Subrouter()
