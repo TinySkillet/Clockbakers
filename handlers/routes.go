@@ -11,6 +11,7 @@ import (
 	m "github.com/TinySkillet/ClockBakers/middlewares"
 	s "github.com/TinySkillet/ClockBakers/storage"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -28,12 +29,17 @@ func (a *APIServer) Run() {
 	// base router
 	router := mux.NewRouter()
 
+	corsMiddleware := handlers.CORS(
+		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
+		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
+	)
+
 	// cors middleware
-	router.Use(m.CorsMiddleware)
+	baseHandler := corsMiddleware(router)
 
 	// v1 router, we can improve to other versions in the future
 	v1Router := router.PathPrefix("/v1").Subrouter()
-	v1Router.Use(m.CorsMiddleware)
 
 	// sub router for get methods, get requests are routed to this router
 	getRouter := v1Router.Methods(http.MethodGet).Subrouter()
@@ -87,7 +93,7 @@ func (a *APIServer) Run() {
 	// api server
 	server := http.Server{
 		Addr:         ":" + a.addr,
-		Handler:      router,
+		Handler:      baseHandler,
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,
