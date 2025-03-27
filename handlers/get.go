@@ -53,10 +53,10 @@ type getUserByIdParams struct {
 func (a *APIServer) HandleGetUserById(w http.ResponseWriter, r *http.Request) {
 	queries := a.getQueries()
 	query := r.URL.Query()
-	idString := query.Get("id")
+	idString := query.Get("uid")
 	id, err := uuid.Parse(idString)
 	if err != nil {
-		m.RespondWithError(w, "Invalid id!", http.StatusBadRequest)
+		m.RespondWithError(w, "Invalid uid!", http.StatusBadRequest)
 		return
 	}
 	dbUser, err := queries.GetUserByID(r.Context(), id)
