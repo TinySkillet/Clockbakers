@@ -13,6 +13,49 @@ import (
 	"github.com/google/uuid"
 )
 
+type DeliveryTimes string
+
+const (
+	DeliveryTimesMorning   DeliveryTimes = "morning"
+	DeliveryTimesAfternoon DeliveryTimes = "afternoon"
+	DeliveryTimesEvening   DeliveryTimes = "evening"
+)
+
+func (e *DeliveryTimes) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = DeliveryTimes(s)
+	case string:
+		*e = DeliveryTimes(s)
+	default:
+		return fmt.Errorf("unsupported scan type for DeliveryTimes: %T", src)
+	}
+	return nil
+}
+
+type NullDeliveryTimes struct {
+	DeliveryTimes DeliveryTimes
+	Valid         bool // Valid is true if DeliveryTimes is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullDeliveryTimes) Scan(value interface{}) error {
+	if value == nil {
+		ns.DeliveryTimes, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.DeliveryTimes.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullDeliveryTimes) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.DeliveryTimes), nil
+}
+
 type OrderStatus string
 
 const (
@@ -123,18 +166,20 @@ type DeliveryAddress struct {
 }
 
 type Order struct {
-	ID              uuid.UUID
-	Status          OrderStatus
-	TotalPrice      float32
-	DeliveryAddress string
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
-	UserID          uuid.UUID
+	ID           uuid.UUID
+	Status       OrderStatus
+	TotalPrice   float32
+	DeliveryTime DeliveryTimes
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	UserID       uuid.UUID
 }
 
 type OrderItem struct {
 	ID              uuid.UUID
 	Quantity        int32
+	Pounds          float32
+	Message         string
 	PriceAtPurchase float32
 	OrderID         uuid.UUID
 	ProductID       uuid.UUID

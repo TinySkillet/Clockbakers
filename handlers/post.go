@@ -384,13 +384,13 @@ func (a *APIServer) HandleCreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	queries := a.getQueries()
 	dbOrder, err := queries.CreateOrder(r.Context(), database.CreateOrderParams{
-		ID:              uuid.New(),
-		Status:          database.OrderStatusPending,
-		TotalPrice:      params.TotalPrice,
-		DeliveryAddress: params.DeliveryAddress,
-		CreatedAt:       time.Now().UTC(),
-		UpdatedAt:       time.Now().UTC(),
-		UserID:          params.UserID,
+		ID:           uuid.New(),
+		Status:       database.OrderStatusPending,
+		TotalPrice:   params.TotalPrice,
+		DeliveryTime: database.DeliveryTimes(params.DeliveryTime),
+		CreatedAt:    time.Now().UTC(),
+		UpdatedAt:    time.Now().UTC(),
+		UserID:       params.UserID,
 	})
 	if err != nil {
 		m.RespondWithError(w, "Failed to create order: "+err.Error(), http.StatusInternalServerError)

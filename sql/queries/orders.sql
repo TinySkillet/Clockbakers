@@ -1,6 +1,6 @@
 -- name: CreateOrder :one
 INSERT INTO orders (
-  ID, status, total_price, delivery_address,
+  ID, status, total_price, delivery_time,
   created_at, updated_at, user_id
 ) VALUES (
   $1, $2, $3,

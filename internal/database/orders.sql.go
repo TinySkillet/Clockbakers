@@ -14,7 +14,7 @@ import (
 
 const createOrder = `-- name: CreateOrder :one
 INSERT INTO orders (
-  ID, status, total_price, delivery_address,
+  ID, status, total_price, delivery_time,
   created_at, updated_at, user_id
 ) VALUES (
   $1, $2, $3,
@@ -22,17 +22,17 @@ INSERT INTO orders (
   $5,
   $6,
   $7
-) RETURNING id, status, total_price, delivery_address, created_at, updated_at, user_id
+) RETURNING id, status, total_price, delivery_time, created_at, updated_at, user_id
 `
 
 type CreateOrderParams struct {
-	ID              uuid.UUID
-	Status          OrderStatus
-	TotalPrice      float32
-	DeliveryAddress string
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
-	UserID          uuid.UUID
+	ID           uuid.UUID
+	Status       OrderStatus
+	TotalPrice   float32
+	DeliveryTime DeliveryTimes
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	UserID       uuid.UUID
 }
 
 func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error) {
@@ -40,7 +40,7 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 		arg.ID,
 		arg.Status,
 		arg.TotalPrice,
-		arg.DeliveryAddress,
+		arg.DeliveryTime,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.UserID,
@@ -50,7 +50,7 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 		&i.ID,
 		&i.Status,
 		&i.TotalPrice,
-		&i.DeliveryAddress,
+		&i.DeliveryTime,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.UserID,
@@ -68,7 +68,7 @@ func (q *Queries) DeleteOrder(ctx context.Context, id uuid.UUID) error {
 }
 
 const getOrder = `-- name: GetOrder :one
-SELECT id, status, total_price, delivery_address, created_at, updated_at, user_id FROM orders WHERE ID = $1
+SELECT id, status, total_price, delivery_time, created_at, updated_at, user_id FROM orders WHERE ID = $1
 `
 
 func (q *Queries) GetOrder(ctx context.Context, id uuid.UUID) (Order, error) {
@@ -78,7 +78,7 @@ func (q *Queries) GetOrder(ctx context.Context, id uuid.UUID) (Order, error) {
 		&i.ID,
 		&i.Status,
 		&i.TotalPrice,
-		&i.DeliveryAddress,
+		&i.DeliveryTime,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.UserID,
@@ -142,7 +142,7 @@ func (q *Queries) GetPopularItems(ctx context.Context) ([]GetPopularItemsRow, er
 }
 
 const listOrders = `-- name: ListOrders :many
-SELECT id, status, total_price, delivery_address, created_at, updated_at, user_id FROM orders 
+SELECT id, status, total_price, delivery_time, created_at, updated_at, user_id FROM orders 
 WHERE 
   ($1 IS NULL OR user_id = $1) AND 
   ($2 = '' OR status = $2)
@@ -167,7 +167,7 @@ func (q *Queries) ListOrders(ctx context.Context, arg ListOrdersParams) ([]Order
 			&i.ID,
 			&i.Status,
 			&i.TotalPrice,
-			&i.DeliveryAddress,
+			&i.DeliveryTime,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.UserID,
@@ -189,7 +189,7 @@ const updateOrderStatus = `-- name: UpdateOrderStatus :one
 UPDATE orders SET 
   status = $2, updated_at = CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
 WHERE ID = $1
-RETURNING id, status, total_price, delivery_address, created_at, updated_at, user_id
+RETURNING id, status, total_price, delivery_time, created_at, updated_at, user_id
 `
 
 type UpdateOrderStatusParams struct {
@@ -204,7 +204,7 @@ func (q *Queries) UpdateOrderStatus(ctx context.Context, arg UpdateOrderStatusPa
 		&i.ID,
 		&i.Status,
 		&i.TotalPrice,
-		&i.DeliveryAddress,
+		&i.DeliveryTime,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.UserID,

@@ -8,24 +8,25 @@ import (
 )
 
 type Order struct {
-	ID              uuid.UUID   `json:"id"`
-	Status          string      `json:"status" validate:"required,oneof=pending processing shipped delivered cancelled"`
-	DeliveryAddress string      `json:"delivery_address" validate:"required"`
-	TotalPrice      float32     `json:"total_price" validate:"required,gt=0"`
-	Items           []OrderItem `json:"items" validate:"required,dive"`
-	CreatedAt       time.Time   `json:"created_at"`
-	UpdatedAt       time.Time   `json:"updated_at"`
-	UserID          uuid.UUID   `json:"user_id" validate:"required"`
+	ID           uuid.UUID   `json:"id"`
+	Status       string      `json:"status"`
+	DeliveryTime string      `json:"delivery_time" validate:"required"`
+	TotalPrice   float32     `json:"total_price" validate:"required,gt=0"`
+	Items        []OrderItem `json:"items" validate:"required,dive"`
+	CreatedAt    time.Time   `json:"created_at"`
+	UpdatedAt    time.Time   `json:"updated_at"`
+	UserID       uuid.UUID   `json:"user_id" validate:"required"`
 }
 
 func DBOrderToOrder(dbOrder database.Order) Order {
 	return Order{
-		ID:         dbOrder.ID,
-		Status:     string(dbOrder.Status),
-		TotalPrice: dbOrder.TotalPrice,
-		CreatedAt:  dbOrder.CreatedAt,
-		UpdatedAt:  dbOrder.UpdatedAt,
-		UserID:     dbOrder.UserID,
+		ID:           dbOrder.ID,
+		Status:       string(dbOrder.Status),
+		DeliveryTime: string(dbOrder.DeliveryTime),
+		TotalPrice:   dbOrder.TotalPrice,
+		CreatedAt:    dbOrder.CreatedAt,
+		UpdatedAt:    dbOrder.UpdatedAt,
+		UserID:       dbOrder.UserID,
 	}
 }
 

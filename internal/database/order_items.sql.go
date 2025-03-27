@@ -13,17 +13,19 @@ import (
 
 const createOrderItem = `-- name: CreateOrderItem :one
 INSERT INTO order_items (
-  ID, quantity, price_at_purchase,
+  ID, quantity, pounds, message, price_at_purchase,
   order_id, product_id)
 VALUES(
   $1, $2, $3,
-  $4, $5)
-RETURNING id, quantity, price_at_purchase, order_id, product_id
+  $4, $5, $6, $7)
+RETURNING id, quantity, pounds, message, price_at_purchase, order_id, product_id
 `
 
 type CreateOrderItemParams struct {
 	ID              uuid.UUID
 	Quantity        int32
+	Pounds          float32
+	Message         string
 	PriceAtPurchase float32
 	OrderID         uuid.UUID
 	ProductID       uuid.UUID
@@ -33,6 +35,8 @@ func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams
 	row := q.db.QueryRowContext(ctx, createOrderItem,
 		arg.ID,
 		arg.Quantity,
+		arg.Pounds,
+		arg.Message,
 		arg.PriceAtPurchase,
 		arg.OrderID,
 		arg.ProductID,
@@ -41,6 +45,8 @@ func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams
 	err := row.Scan(
 		&i.ID,
 		&i.Quantity,
+		&i.Pounds,
+		&i.Message,
 		&i.PriceAtPurchase,
 		&i.OrderID,
 		&i.ProductID,
@@ -49,7 +55,7 @@ func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams
 }
 
 const getOrderItemsByOrderID = `-- name: GetOrderItemsByOrderID :many
-SELECT id, quantity, price_at_purchase, order_id, product_id FROM order_items 
+SELECT id, quantity, pounds, message, price_at_purchase, order_id, product_id FROM order_items 
 WHERE order_id = $1
 `
 
@@ -65,6 +71,8 @@ func (q *Queries) GetOrderItemsByOrderID(ctx context.Context, orderID uuid.UUID)
 		if err := rows.Scan(
 			&i.ID,
 			&i.Quantity,
+			&i.Pounds,
+			&i.Message,
 			&i.PriceAtPurchase,
 			&i.OrderID,
 			&i.ProductID,
