@@ -45,7 +45,11 @@ func (a *APIServer) HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := m.User{}
-	m.FromJSON(r, &params)
+	err = m.FromJSON(r, &params)
+	if err != nil {
+		m.RespondWithError(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	phoneNo := sql.NullString{String: params.PhoneNo, Valid: params.PhoneNo != ""}
 	email := sql.NullString{String: params.Email, Valid: params.Email != ""}
